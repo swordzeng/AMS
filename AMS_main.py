@@ -18,17 +18,12 @@ class Ui_MainWindow(QWidget):
         vSplit = QtWidgets.QSplitter(QtCore.Qt.Vertical)
         btnReport = QtWidgets.QPushButton('REPORT')
         btnReport.setObjectName('REPORT')
+        btnReport.setFixedSize(200,50)
         vSplit.addWidget(btnReport)
         btnFunc = QtWidgets.QPushButton('FUNCTION')
         btnFunc.setObjectName('FUNCTION')
+        btnFunc.setFixedSize(200,50)
         vSplit.addWidget(btnFunc)
-        #vbox.addStretch(1)
-
-        """
-        self.hbox = QtWidgets.QHBoxLayout(self)
-        self.hbox.addLayout(vbox)
-        self.hbox.addWidget(self.first)
-        """
         
         self.splitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
         self.splitter.addWidget(vSplit)
@@ -36,6 +31,7 @@ class Ui_MainWindow(QWidget):
 
         hbox = QtWidgets.QHBoxLayout(self)
         hbox.addWidget(self.splitter)
+        #self.splitter.setStretchFactor(0,0)
         self.setLayout(hbox)
 
         btnReport.clicked.connect(lambda :self.change(btnReport.objectName()))
