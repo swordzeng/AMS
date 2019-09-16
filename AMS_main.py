@@ -10,7 +10,7 @@ class Ui_MainWindow(QWidget):
         QtWidgets.QWidget.__init__(self, parent=None)
         
         self.setWindowTitle('AMS')
-        self.resize(500,300)
+        self.resize(800,600)
 
         self.first = First()
         self.second = Second()
@@ -18,12 +18,15 @@ class Ui_MainWindow(QWidget):
         vSplit = QtWidgets.QSplitter(QtCore.Qt.Vertical)
         btnReport = QtWidgets.QPushButton('REPORT')
         btnReport.setObjectName('REPORT')
-        btnReport.setFixedSize(200,50)
+        btnReport.setFixedSize(150,40)
         vSplit.addWidget(btnReport)
         btnFunc = QtWidgets.QPushButton('FUNCTION')
         btnFunc.setObjectName('FUNCTION')
-        btnFunc.setFixedSize(200,50)
+        btnFunc.setFixedSize(150,40)
         vSplit.addWidget(btnFunc)
+        #用frame占位，保持菜单按钮位置固定不变
+        frame = QtWidgets.QFrame()
+        vSplit.addWidget(frame)
         
         self.splitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
         self.splitter.addWidget(vSplit)
@@ -31,7 +34,6 @@ class Ui_MainWindow(QWidget):
 
         hbox = QtWidgets.QHBoxLayout(self)
         hbox.addWidget(self.splitter)
-        #self.splitter.setStretchFactor(0,0)
         self.setLayout(hbox)
 
         btnReport.clicked.connect(lambda :self.change(btnReport.objectName()))
