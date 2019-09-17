@@ -15,31 +15,47 @@ class Ui_MainWindow(QWidget):
         self.first = First()
         self.second = Second()
 
-        vSplit = QtWidgets.QSplitter(QtCore.Qt.Vertical)
+        funcSplitter = QtWidgets.QSplitter(QtCore.Qt.Vertical)
         btnReport = QtWidgets.QPushButton('REPORT')
-        btnReport.setObjectName('REPORT')
-        btnReport.setFixedSize(150,40)
-        vSplit.addWidget(btnReport)
+        btnReport.setFixedSize(150,30)
+        funcSplitter.addWidget(btnReport)
         btnFunc = QtWidgets.QPushButton('FUNCTION')
-        btnFunc.setObjectName('FUNCTION')
-        btnFunc.setFixedSize(150,40)
-        vSplit.addWidget(btnFunc)
+        btnFunc.setFixedSize(150,30)
+        funcSplitter.addWidget(btnFunc)
         #用frame占位，保持菜单按钮位置固定不变
         frame = QtWidgets.QFrame()
-        vSplit.addWidget(frame)
-        
+        funcSplitter.addWidget(frame)
+        #funcSplitter.setFrameShape(1)
+        #funcSplitter.setFixedWidth(160)
+
         self.splitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
-        self.splitter.addWidget(vSplit)
+        self.splitter.setHandleWidth(20)
+        self.splitter.addWidget(funcSplitter)
         self.splitter.addWidget(self.first)
+        self.splitter.setSizes([0, 1]) 
 
-        hbox = QtWidgets.QHBoxLayout(self)
-        hbox.addWidget(self.splitter)
-        self.setLayout(hbox)
+        layout = QtWidgets.QVBoxLayout(self) 
+        layout.addWidget(self.splitter) 
+        handle = self.splitter.handle(1) 
+        layout = QtWidgets.QVBoxLayout() 
+        layout.setContentsMargins(0, 0, 0, 0) 
+        button = QtWidgets.QToolButton(handle) 
+        button.setArrowType(QtCore.Qt.LeftArrow) 
+        button.setFixedSize(20,40)
+        button.clicked.connect(lambda: self.handleSplitterButton(True)) 
+        layout.addWidget(button) 
+        handle.setLayout(layout) 
 
-        btnReport.clicked.connect(lambda :self.change(btnReport.objectName()))
-        btnFunc.clicked.connect(lambda :self.change(btnFunc.objectName()))
+        btnReport.clicked.connect(lambda :self.changeUI('REPORT'))
+        btnFunc.clicked.connect(lambda :self.changeUI('FUNCTION'))
 
-    def change(self,name):
+    def handleSplitterButton(self, left=True): 
+        if not all(self.splitter.sizes()): 
+            self.splitter.setSizes([1, 1]) 
+        elif left: 
+            self.splitter.setSizes([0, 1]) 
+
+    def changeUI(self,name):
         if name == "REPORT":
             self.splitter.widget(1).setParent(None)
             self.splitter.insertWidget(1, self.first)
@@ -68,8 +84,6 @@ class Second(QWidget, Ui_Second):
 if __name__ == '__main__':
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    #MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
-    #ui.setupUi(MainWindow)
     ui.show()
     sys.exit(app.exec_())
