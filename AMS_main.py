@@ -36,7 +36,13 @@ class Ui_MainWindow(QWidget):
 
         layout = QtWidgets.QVBoxLayout(self) 
         layout.addWidget(self.splitter) 
-        handle = self.splitter.handle(1) 
+        self.handleLayout(self.splitter)
+
+        btnReport.clicked.connect(lambda :self.changeUI('REPORT'))
+        btnFunc.clicked.connect(lambda :self.changeUI('FUNCTION'))
+
+    def handleLayout(self, splitter):
+        handle = splitter.handle(1) 
         layout = QtWidgets.QVBoxLayout() 
         layout.setContentsMargins(0, 0, 0, 0) 
         button = QtWidgets.QToolButton(handle) 
@@ -45,9 +51,6 @@ class Ui_MainWindow(QWidget):
         button.clicked.connect(lambda: self.handleSplitterButton(True)) 
         layout.addWidget(button) 
         handle.setLayout(layout) 
-
-        btnReport.clicked.connect(lambda :self.changeUI('REPORT'))
-        btnFunc.clicked.connect(lambda :self.changeUI('FUNCTION'))
 
     def handleSplitterButton(self, left=True): 
         if not all(self.splitter.sizes()): 
@@ -59,10 +62,12 @@ class Ui_MainWindow(QWidget):
         if name == "REPORT":
             self.splitter.widget(1).setParent(None)
             self.splitter.insertWidget(1, self.first)
+            self.handleLayout(self.splitter)
  
         if name == "FUNCTION":
             self.splitter.widget(1).setParent(None)
             self.splitter.insertWidget(1, self.second)
+            self.handleLayout(self.splitter)
         
 class First(QWidget, Ui_First):
     def __init__(self):
