@@ -7,13 +7,65 @@
 # WARNING! All changes made in this file will be lost!
  
 from PyQt5 import QtCore, QtGui, QtWidgets
+from DataFrameModel import PandasModel
+import pandas as pd
  
  
 class Ui_First(object):
     def initUI(self, Ui_First):
         
-        self.resize(800, 600)
-        hLayout = QtWidgets.QHBoxLayout(Ui_First)
+        self.rptDate = ''
+        self.rptAcct = ''
+
+        vLayout = QtWidgets.QVBoxLayout(self)
+        hLayout = QtWidgets.QHBoxLayout()
+
+        lblDate = QtWidgets.QLabel(self)
+        lblDate.setText('Date')
+        hLayout.addWidget(lblDate)
+
+        cal = QtWidgets.QCalendarWidget(self)
+        dtEdit = QtWidgets.QDateEdit(QtCore.QDate.currentDate(), self)
+        dtEdit.setCalendarPopup(True)
+        dtEdit.setCalendarWidget(cal)
+        dtEdit.setMaximumDate(QtCore.QDate.currentDate())
+        dtEdit.setDate(cal.selectedDate())
+        dtEdit.dateChanged.connect(self.saveDate)
+        hLayout.addWidget(dtEdit)
+
+        lblAcct = QtWidgets.QLabel(self)
+        lblAcct.setText('Account')
+        hLayout.addWidget(lblAcct)
+
+        comboAcct = QtWidgets.QComboBox()
+        comboAcct.addItems(['Citic', 'CMB', 'ALL'])
+        comboAcct.currentTextChanged.connect(self.saveAcct)
+        hLayout.addWidget(comboAcct)
+
+        hLayout.addStretch(1)
+
+        btnReport = QtWidgets.QPushButton("REPORT", self)
+        btnReport.clicked.connect(self.loadReport)
+        hLayout.addWidget(btnReport)
+
+        vLayout.addLayout(hLayout)
+
+        self.tblHold = QtWidgets.QTableView(self)
         
-        label = QtWidgets.QLabel('This is form 1')
-        hLayout.addWidget(label)
+        vLayout.addWidget(self.tblHold)
+
+        self.rptDate = dtEdit.date().toString('yyyyMMdd')
+        self.rptAcct = comboAcct.currentText()
+
+    def loadReport(self):
+        df = pd.read_excel('A_Shares.xlsx',sheet_name='Trans')
+        model = PandasModel(df)
+        self.tblHold.setModel(model)
+        self.tblHold.setSortingEnabled(True)
+        self.tblHold.horizontalHeader().setStyleSheet("QHeaderView::section {background-color:lightblue;color: black;padding-left: 4px;border: 1px solid #6c6c6c;font: bold;}")
+
+    def saveAcct(self, str):
+        self.rptAcct = str
+
+    def saveDate(self, date):
+        self.rptDate = date.toString('yyyyMMdd')

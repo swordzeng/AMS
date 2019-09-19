@@ -8,9 +8,10 @@ from second import Ui_Second
 class Ui_MainWindow(QWidget):
     def __init__(self, parent=None):
         QtWidgets.QWidget.__init__(self, parent=None)
-        
+        QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
+
         self.setWindowTitle('AMS')
-        self.resize(800,600)
+        self.resize(1200,600)
 
         self.first = First()
         self.second = Second()
@@ -25,8 +26,6 @@ class Ui_MainWindow(QWidget):
         #用frame占位，保持菜单按钮位置固定不变
         frame = QtWidgets.QFrame()
         funcSplitter.addWidget(frame)
-        #funcSplitter.setFrameShape(1)
-        #funcSplitter.setFixedWidth(160)
 
         self.splitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
         self.splitter.setHandleWidth(20)
