@@ -5,38 +5,59 @@ from PyQt5.QtWidgets import QWidget
 from first import Ui_First
 from second import Ui_Second
  
-class Ui_MainWindow(QWidget):
+class Ui_MainWindow(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         QtWidgets.QWidget.__init__(self, parent=None)
-        QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
-
+        
+        # initialize format of main form
         self.setWindowTitle('AMS')
-        self.resize(1200,600)
+        self.setFixedSize(1200,600)
+        #self.resize(1200,600)
 
         self.first = First()
         self.second = Second()
+        self.mainSplitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
 
-        funcSplitter = QtWidgets.QSplitter(QtCore.Qt.Vertical)
+        # main form layout
+        mainWidget = QtWidgets.QWidget()
+        mainLayout = QtWidgets.QVBoxLayout()
+        mainWidget.setLayout(mainLayout)
+        mainLayout.addWidget(self.mainSplitter)
+        self.setCentralWidget(mainWidget)
+
+        # initialize menu widgets
+        menuSplitter = QtWidgets.QSplitter(QtCore.Qt.Vertical)
+        menuSplitter.setHandleWidth(0)
+        btnLogo = QtWidgets.QToolButton()
+        btnLogo.setIcon(QtGui.QIcon('logo.png'))
+        btnLogo.setIconSize(QtCore.QSize(150,50))
+        menuSplitter.addWidget(btnLogo)
         btnReport = QtWidgets.QPushButton('REPORT')
         btnReport.setFixedSize(150,30)
-        funcSplitter.addWidget(btnReport)
+        menuSplitter.addWidget(btnReport)
         btnFunc = QtWidgets.QPushButton('FUNCTION')
         btnFunc.setFixedSize(150,30)
-        funcSplitter.addWidget(btnFunc)
+        menuSplitter.addWidget(btnFunc)
         #用frame占位，保持菜单按钮位置固定不变
         frame = QtWidgets.QFrame()
-        funcSplitter.addWidget(frame)
+        menuSplitter.addWidget(frame)
 
-        self.splitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
-        self.splitter.setHandleWidth(20)
-        self.splitter.addWidget(funcSplitter)
-        self.splitter.addWidget(self.first)
-        self.splitter.setSizes([0, 1]) 
+        # initialize main splitter
+        self.mainSplitter.addWidget(menuSplitter)
+        self.mainSplitter.addWidget(self.first)
+        #菜单默认关闭
+        self.mainSplitter.setSizes([1, 1]) 
 
-        layout = QtWidgets.QVBoxLayout(self) 
-        layout.addWidget(self.splitter) 
-        self.handleLayout(self.splitter)
+        # format handle of main splitter
+        self.mainSplitter.setHandleWidth(20)
+        self.handleLayout(self.mainSplitter)
 
+        menuSplitter.setStyleSheet('''
+            QPushButton{border:none;color:black;}
+            QToolButton{border:none;}
+            ''')
+
+        # connect button function
         btnReport.clicked.connect(lambda :self.changeUI('REPORT'))
         btnFunc.clicked.connect(lambda :self.changeUI('FUNCTION'))
 
@@ -52,21 +73,21 @@ class Ui_MainWindow(QWidget):
         handle.setLayout(layout) 
 
     def handleSplitterButton(self, left=True): 
-        if not all(self.splitter.sizes()): 
-            self.splitter.setSizes([1, 1]) 
+        if not all(self.mainSplitter.sizes()): 
+            self.mainSplitter.setSizes([1, 1]) 
         elif left: 
-            self.splitter.setSizes([0, 1]) 
+            self.mainSplitter.setSizes([0, 1]) 
 
     def changeUI(self,name):
         if name == "REPORT":
-            self.splitter.widget(1).setParent(None)
-            self.splitter.insertWidget(1, self.first)
-            self.handleLayout(self.splitter)
+            self.mainSplitter.widget(1).setParent(None)
+            self.mainSplitter.insertWidget(1, self.first)
+            self.handleLayout(self.mainSplitter)
  
         if name == "FUNCTION":
-            self.splitter.widget(1).setParent(None)
-            self.splitter.insertWidget(1, self.second)
-            self.handleLayout(self.splitter)
+            self.mainSplitter.widget(1).setParent(None)
+            self.mainSplitter.insertWidget(1, self.second)
+            self.handleLayout(self.mainSplitter)
         
 class First(QWidget, Ui_First):
     def __init__(self):
