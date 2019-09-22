@@ -13,7 +13,7 @@ import pandas as pd
  
 class Ui_First(object):
     def initUI(self, Ui_First):
-        
+
         self.rptDate = ''
         self.rptAcct = ''
 
@@ -48,7 +48,11 @@ class Ui_First(object):
         btnReport.clicked.connect(self.loadReport)
         hLayout.addWidget(btnReport)
 
-        vLayout.addLayout(hLayout)
+        widget = QtWidgets.QWidget()
+        widget.setLayout(hLayout)
+        widget.setFixedHeight(50)
+
+        vLayout.addWidget(widget)
 
         self.tblHold = QtWidgets.QTableView(self)
         

@@ -11,7 +11,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         
         # initialize format of main form
         self.setWindowTitle('AMS')
-        self.setFixedSize(1200,600)
+        self.setFixedSize(900,600)
         #self.resize(1200,600)
 
         self.first = First()
@@ -21,6 +21,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # main form layout
         mainWidget = QtWidgets.QWidget()
         mainLayout = QtWidgets.QVBoxLayout()
+        mainLayout.setContentsMargins(3, 0, 3, 1)
         mainWidget.setLayout(mainLayout)
         mainLayout.addWidget(self.mainSplitter)
         self.setCentralWidget(mainWidget)
@@ -28,10 +29,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # initialize menu widgets
         menuSplitter = QtWidgets.QSplitter(QtCore.Qt.Vertical)
         menuSplitter.setHandleWidth(0)
-        btnLogo = QtWidgets.QToolButton()
-        btnLogo.setIcon(QtGui.QIcon('logo.png'))
-        btnLogo.setIconSize(QtCore.QSize(150,50))
-        menuSplitter.addWidget(btnLogo)
+        pixLogo = QtGui.QPixmap('logo.png')
+        lblLogo = QtWidgets.QLabel()
+        lblLogo.setScaledContents(True)
+        lblLogo.setFixedSize(150,60)
+        lblLogo.setPixmap(pixLogo)
+        menuSplitter.addWidget(lblLogo)
         btnReport = QtWidgets.QPushButton('REPORT')
         btnReport.setFixedSize(150,30)
         menuSplitter.addWidget(btnReport)
@@ -53,8 +56,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.handleLayout(self.mainSplitter)
 
         menuSplitter.setStyleSheet('''
-            QPushButton{border:none;color:black;}
-            QToolButton{border:none;}
+            QPushButton{border:none;color:white;;background-color:black}
+            QLabel{border:none;background-color:black}
+            QFrame{border:none;background-color:black}
             ''')
 
         # connect button function
@@ -69,7 +73,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         button.setArrowType(QtCore.Qt.LeftArrow) 
         button.setFixedSize(20,40)
         button.clicked.connect(lambda: self.handleSplitterButton(True)) 
-        layout.addWidget(button) 
+        layout.addWidget(button)
         handle.setLayout(layout) 
 
     def handleSplitterButton(self, left=True): 
