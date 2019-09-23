@@ -47,20 +47,22 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         # initialize main splitter
         self.mainSplitter.addWidget(menuSplitter)
-        self.mainSplitter.addWidget(self.first)
+        frameTest = QtWidgets.QFrame()
+        frameTest.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.mainSplitter.addWidget(frameTest)
         #菜单默认关闭
         self.mainSplitter.setSizes([1, 1]) 
 
         # format handle of main splitter
         self.mainSplitter.setHandleWidth(20)
         self.handleLayout(self.mainSplitter)
-        
-        #self.mainSplitter.setStyleSheet('''
-        #    QWidget{border-style:solid;border-width:2;border-color:red}
-        #    ''')
+
+        self.mainSplitter.setStyleSheet('''
+            QWidget{border-style:solid;border-width:2;border-color:red}
+            ''')
         
         menuSplitter.setStyleSheet('''
-            QPushButton{border:none;color:white;background-color:black}
+            QPushButton{border:none;color:white;;background-color:black}
             QLabel{border:none;background-color:black}
             QFrame{border:none;background-color:black}
             ''')

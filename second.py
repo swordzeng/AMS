@@ -11,9 +11,12 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Second(object):
     def initUI(self, Ui_Second):
         
-        self.resize(800, 600)
-        hLayout = QtWidgets.QHBoxLayout(Ui_Second)
-        
+        hLayout = QtWidgets.QHBoxLayout()
         label = QtWidgets.QLabel('This is form 2222')
         hLayout.addWidget(label)
+        frame = QtWidgets.QFrame()
+        hLayout.addWidget(frame)
+        hLayout.setContentsMargins(0, 0, 0, 0) 
+ 
+        self.setLayout(hLayout)
  

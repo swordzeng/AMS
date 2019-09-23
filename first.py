@@ -53,6 +53,7 @@ class Ui_First(object):
         widget.setFixedHeight(50)
 
         vLayout.addWidget(widget)
+        vLayout.setContentsMargins(0, 0, 0, 0)
 
         self.tblHold = QtWidgets.QTableView(self)
         
