@@ -13,12 +13,14 @@ import pandas as pd
  
 class Ui_First(object):
     def initUI(self, Ui_First):
+        self.setStyleSheet("border-style:solid;border-width:2;border-color:red;")
 
         self.rptDate = ''
         self.rptAcct = ''
 
         vLayout = QtWidgets.QVBoxLayout(self)
         hLayout = QtWidgets.QHBoxLayout()
+        hLayout2 = QtWidgets.QHBoxLayout()
 
         lblDate = QtWidgets.QLabel(self)
         lblDate.setText('Date')
@@ -53,11 +55,16 @@ class Ui_First(object):
         widget.setFixedHeight(50)
 
         vLayout.addWidget(widget)
+
+        hLayout.setContentsMargins(0, 0, 0, 0)
+        hLayout2.setContentsMargins(0, 0, 0, 0)
         vLayout.setContentsMargins(0, 0, 0, 0)
+        vLayout.setSpacing(0)
 
         self.tblHold = QtWidgets.QTableView(self)
-        
-        vLayout.addWidget(self.tblHold)
+        hLayout2.addWidget(self.tblHold)
+
+        vLayout.addLayout(hLayout2)
 
         self.rptDate = dtEdit.date().toString('yyyyMMdd')
         self.rptAcct = comboAcct.currentText()

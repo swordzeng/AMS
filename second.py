@@ -10,13 +10,21 @@ from PyQt5 import QtCore, QtGui, QtWidgets
  
 class Ui_Second(object):
     def initUI(self, Ui_Second):
-        
-        hLayout = QtWidgets.QHBoxLayout()
-        label = QtWidgets.QLabel('This is form 2222')
-        hLayout.addWidget(label)
-        frame = QtWidgets.QFrame()
-        hLayout.addWidget(frame)
-        hLayout.setContentsMargins(0, 0, 0, 0) 
- 
-        self.setLayout(hLayout)
+        mainLayout = QtWidgets.QVBoxLayout()
+        #self.verticalLayoutR.setSpacing(0)
+        Frame = QtWidgets.QFrame(self)
+        Frame.setStyleSheet('''
+            QFrame{border-style:solid;border-width:2;border-color:red;;background-color:yellow}
+            QLabel{border-style:none;}
+            ''')
+        #self.exitFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        #self.exitFrame.setFrameShadow(QtWidgets.QFrame.Raised)
+        frameLayout = QtWidgets.QVBoxLayout(Frame)
+        exitBtn = QtWidgets.QPushButton("Exit", Frame)
+        label = QtWidgets.QLabel('This is 222', Frame)
+        frameLayout.addWidget(exitBtn)
+        frameLayout.addWidget(label)
+        mainLayout.addWidget(Frame)
+        mainLayout.setContentsMargins(0,0,0,0)
+        self.setLayout(mainLayout)
  
