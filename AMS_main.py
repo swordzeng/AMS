@@ -12,6 +12,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # initialize format of main form
         self.setWindowTitle('AMS')
         self.setFixedSize(900,600)
+        self.setStyleSheet("background-color:lightblue")
         #self.resize(1200,600)
 
         self.first = First()
@@ -21,7 +22,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # main form layout
         mainWidget = QtWidgets.QWidget()
         mainLayout = QtWidgets.QVBoxLayout()
-        mainLayout.setContentsMargins(3, 0, 3, 1)
+        mainLayout.setContentsMargins(0, 0, 0, 0)
         mainWidget.setLayout(mainLayout)
         mainLayout.addWidget(self.mainSplitter)
         self.setCentralWidget(mainWidget)
