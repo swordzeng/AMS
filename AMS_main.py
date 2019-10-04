@@ -32,19 +32,38 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         menuSplitter.setHandleWidth(0)
         pixLogo = QtGui.QPixmap('logo.png')
         lblLogo = QtWidgets.QLabel()
-        lblLogo.setScaledContents(True)
-        lblLogo.setFixedSize(150,60)
         lblLogo.setPixmap(pixLogo)
-        menuSplitter.addWidget(lblLogo)
         btnReport = QtWidgets.QPushButton('REPORT')
-        btnReport.setFixedSize(150,30)
-        menuSplitter.addWidget(btnReport)
         btnFunc = QtWidgets.QPushButton('FUNCTION')
-        btnFunc.setFixedSize(150,30)
+
+        menuSplitter.addWidget(lblLogo)
+        menuSplitter.addWidget(btnReport)
         menuSplitter.addWidget(btnFunc)
         #用frame占位，保持菜单按钮位置固定不变
         frame = QtWidgets.QFrame()
         menuSplitter.addWidget(frame)
+
+        # set menu & button size
+        lblLogo.setScaledContents(True)
+        lblLogo.setFixedSize(180,80)
+        btnReport.setFixedHeight(40)
+        btnFunc.setFixedHeight(40)
+
+        # make splitter handle invisible
+        menuSplitter.handle(1).setFixedHeight(1)
+        menuSplitter.handle(2).setFixedHeight(1)
+        menuSplitter.handle(3).setFixedHeight(1)
+
+        # set menu button separate line format
+        lblLogo.setStyleSheet("border-bottom-style:solid;border-bottom-width:1;border-bottom-color:white")
+        btnReport.setStyleSheet("border-bottom-style:solid;border-bottom-width:1;border-bottom-color:white")
+        btnFunc.setStyleSheet("border-bottom-style:solid;border-bottom-width:1;border-bottom-color:white")
+
+        menuSplitter.setStyleSheet('''
+            QPushButton{border:none;color:white;background-color:black}
+            QLabel{border:none;background-color:black}
+            QFrame{border:none;background-color:black}
+            ''')
 
         # initialize main splitter
         self.mainSplitter.addWidget(menuSplitter)
@@ -60,12 +79,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #    QWidget{border-style:solid;border-width:2;border-color:red}
         #    ''')
         
-        menuSplitter.setStyleSheet('''
-            QPushButton{border:none;color:white;background-color:black}
-            QLabel{border:none;background-color:black}
-            QFrame{border:none;background-color:black}
-            ''')
-
         # connect button function
         btnReport.clicked.connect(lambda :self.changeUI('REPORT'))
         btnFunc.clicked.connect(lambda :self.changeUI('FUNCTION'))
