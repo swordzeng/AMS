@@ -11,9 +11,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         
         # initialize format of main form
         self.setWindowTitle('AMS')
-        self.setFixedSize(900,600)
+        #self.setFixedSize(900,600)
+        self.resize(900,600)
         self.setStyleSheet("background-color:lightblue")
-        #self.resize(1200,600)
 
         self.first = First()
         self.second = Second()
@@ -65,20 +65,20 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             QFrame{border:none;background-color:black}
             ''')
 
+        # connect button function
+        btnReport.clicked.connect(lambda :self.changeUI('REPORT'))
+        btnFunc.clicked.connect(lambda :self.changeUI('FUNCTION'))
+
         # initialize main splitter
         self.mainSplitter.addWidget(menuSplitter)
         self.mainSplitter.addWidget(self.first)
-        #菜单默认关闭
+        #菜单默认展开
         self.mainSplitter.setSizes([1, 1]) 
 
         # format handle of main splitter
         self.mainSplitter.setHandleWidth(20)
         self.handleLayout(self.mainSplitter)
         
-        # connect button function
-        btnReport.clicked.connect(lambda :self.changeUI('REPORT'))
-        btnFunc.clicked.connect(lambda :self.changeUI('FUNCTION'))
-
     def handleLayout(self, splitter):
         handle = splitter.handle(1) 
         layout = QtWidgets.QVBoxLayout() 
@@ -113,16 +113,10 @@ class First(QWidget, Ui_First):
         # 子窗口初始化时实现子窗口布局
         self.initUI(self)
  
-        # 设置子窗体最小尺寸
-        self.setMinimumWidth(30)
-        self.setMinimumHeight(30)
- 
 class Second(QWidget, Ui_Second):
     def __init__(self):
         super(Second,self).__init__()
         self.initUI(self)
-        self.setMinimumWidth(30)
-        self.setMinimumHeight(30)
  
 if __name__ == '__main__':
     import sys

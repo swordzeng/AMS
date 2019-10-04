@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
  
-# Form implementation generated from reading ui file 'first.ui'
-#
-# Created by: PyQt5 UI code generator 5.11.3
-#
-# WARNING! All changes made in this file will be lost!
- 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from DataFrameModel import PandasModel
 import pandas as pd
@@ -33,7 +27,7 @@ class Ui_First(object):
         dtEdit.setMaximumDate(QtCore.QDate.currentDate())
         dtEdit.setDate(cal.selectedDate())
         dtEdit.dateChanged.connect(self.saveDate)
-        dtEdit.setFixedWidth(120)
+        #dtEdit.setFixedWidth(120)
         hLayout.addWidget(dtEdit)
 
         lblAcct = QtWidgets.QLabel(self)
@@ -46,7 +40,7 @@ class Ui_First(object):
         #comboAcct.lineEdit().setStyleSheet("text-align:center; vertical-align: middle;")
         comboAcct.addItems(['Citic', 'CMB', 'ALL'])
         comboAcct.currentTextChanged.connect(self.saveAcct)
-        comboAcct.setFixedWidth(80)
+        #comboAcct.setFixedWidth(80)
         #comboAcct.setStyleSheet("text-align:center; vertical-align: middle;")
         comboAcct.setStyleSheet("background-color:white;")
         hLayout.addWidget(comboAcct)
@@ -61,7 +55,7 @@ class Ui_First(object):
 
         widget = QtWidgets.QWidget()
         widget.setLayout(hLayout)
-        widget.setFixedHeight(50)
+        #widget.setFixedHeight(50)
 
         vLayout.addWidget(widget)
 
