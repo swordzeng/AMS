@@ -75,10 +75,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.mainSplitter.setHandleWidth(20)
         self.handleLayout(self.mainSplitter)
         
-        #self.mainSplitter.setStyleSheet('''
-        #    QWidget{border-style:solid;border-width:2;border-color:red}
-        #    ''')
-        
         # connect button function
         btnReport.clicked.connect(lambda :self.changeUI('REPORT'))
         btnFunc.clicked.connect(lambda :self.changeUI('FUNCTION'))
