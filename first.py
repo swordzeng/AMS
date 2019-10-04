@@ -13,7 +13,7 @@ import pandas as pd
  
 class Ui_First(object):
     def initUI(self, Ui_First):
-        self.setStyleSheet("border-style:solid;border-width:2;border-color:red;")
+        #self.setStyleSheet("border-style:solid;border-width:2;border-color:red;")
 
         self.rptDate = ''
         self.rptAcct = ''
@@ -33,6 +33,7 @@ class Ui_First(object):
         dtEdit.setMaximumDate(QtCore.QDate.currentDate())
         dtEdit.setDate(cal.selectedDate())
         dtEdit.dateChanged.connect(self.saveDate)
+        dtEdit.setFixedWidth(120)
         hLayout.addWidget(dtEdit)
 
         lblAcct = QtWidgets.QLabel(self)
@@ -40,15 +41,23 @@ class Ui_First(object):
         hLayout.addWidget(lblAcct)
 
         comboAcct = QtWidgets.QComboBox()
+        comboAcct.setEditable(True)
+        comboAcct.lineEdit().setAlignment(QtCore.Qt.AlignLeft)
+        #comboAcct.lineEdit().setStyleSheet("text-align:center; vertical-align: middle;")
         comboAcct.addItems(['Citic', 'CMB', 'ALL'])
         comboAcct.currentTextChanged.connect(self.saveAcct)
+        comboAcct.setFixedWidth(80)
+        #comboAcct.setStyleSheet("text-align:center; vertical-align: middle;")
+        comboAcct.setStyleSheet("background-color:white;")
         hLayout.addWidget(comboAcct)
 
-        hLayout.addStretch(1)
+        hLayout.addStretch(10)
 
-        btnReport = QtWidgets.QPushButton("REPORT", self)
+        btnReport = QtWidgets.QPushButton("RUN REPORT", self)
         btnReport.clicked.connect(self.loadReport)
         hLayout.addWidget(btnReport)
+
+        hLayout.addStretch(1)
 
         widget = QtWidgets.QWidget()
         widget.setLayout(hLayout)
