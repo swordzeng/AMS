@@ -4,12 +4,13 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QWidget
 from first import Ui_First
 from second import Ui_Second
+import sys
  
 class Ui_MainWindow(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         QtWidgets.QWidget.__init__(self, parent=None)
         
-        # initialize format of main form
+        #initialize format of main form
         self.setWindowTitle('AMS')
         #self.setFixedSize(900,600)
         self.resize(900,600)
@@ -19,7 +20,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.second = Second()
         self.mainSplitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
 
-        # main form layout
+        #main form layout
         mainWidget = QtWidgets.QWidget()
         mainLayout = QtWidgets.QVBoxLayout()
         mainLayout.setContentsMargins(0, 0, 0, 0)
@@ -27,7 +28,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         mainLayout.addWidget(self.mainSplitter)
         self.setCentralWidget(mainWidget)
 
-        # initialize menu widgets
+        #initialize menu widgets
         menuSplitter = QtWidgets.QSplitter(QtCore.Qt.Vertical)
         menuSplitter.setHandleWidth(0)
         pixLogo = QtGui.QPixmap('logo.png')
@@ -43,18 +44,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         frame = QtWidgets.QFrame()
         menuSplitter.addWidget(frame)
 
-        # set menu & button size
+        #set menu & button size
         lblLogo.setScaledContents(True)
         lblLogo.setFixedSize(180,80)
         btnReport.setFixedHeight(40)
         btnFunc.setFixedHeight(40)
 
-        # make splitter handle invisible
+        #make splitter handle invisible
         menuSplitter.handle(1).setFixedHeight(1)
         menuSplitter.handle(2).setFixedHeight(1)
         menuSplitter.handle(3).setFixedHeight(1)
 
-        # set menu button separate line format
+        #set menu button separate line format
         lblLogo.setStyleSheet("border-bottom-style:solid;border-bottom-width:1;border-bottom-color:white")
         btnReport.setStyleSheet("border-bottom-style:solid;border-bottom-width:1;border-bottom-color:white")
         btnFunc.setStyleSheet("border-bottom-style:solid;border-bottom-width:1;border-bottom-color:white")
@@ -65,17 +66,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             QFrame{border:none;background-color:black}
             ''')
 
-        # connect button function
+        #connect button function
         btnReport.clicked.connect(lambda :self.changeUI('REPORT'))
         btnFunc.clicked.connect(lambda :self.changeUI('FUNCTION'))
 
-        # initialize main splitter
+        #initialize main splitter
         self.mainSplitter.addWidget(menuSplitter)
         self.mainSplitter.addWidget(self.first)
         #菜单默认展开
         self.mainSplitter.setSizes([1, 1]) 
 
-        # format handle of main splitter
+        #format handle of main splitter
         self.mainSplitter.setHandleWidth(20)
         self.handleLayout(self.mainSplitter)
         
@@ -110,7 +111,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 class First(QWidget, Ui_First):
     def __init__(self):
         super(First,self).__init__()
-        # 子窗口初始化时实现子窗口布局
+        #子窗口初始化时实现子窗口布局
         self.initUI(self)
  
 class Second(QWidget, Ui_Second):
@@ -119,7 +120,8 @@ class Second(QWidget, Ui_Second):
         self.initUI(self)
  
 if __name__ == '__main__':
-    import sys
+    #字体大小自适应分辨率
+    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
     app = QtWidgets.QApplication(sys.argv)
     ui = Ui_MainWindow()
     ui.show()
