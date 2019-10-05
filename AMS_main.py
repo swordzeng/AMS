@@ -2,7 +2,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QWidget
-from first import Ui_First
+from rptDailySummary import Ui_DailySummary
 from second import Ui_Second
 import sys
  
@@ -12,11 +12,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         
         #initialize format of main form
         self.setWindowTitle('AMS')
-        #self.setFixedSize(900,600)
         self.resize(900,600)
         self.setStyleSheet("background-color:lightblue")
 
-        self.first = First()
+        self.formDailySummary = initDailySummary()
         self.second = Second()
         self.mainSplitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
 
@@ -72,7 +71,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         #initialize main splitter
         self.mainSplitter.addWidget(menuSplitter)
-        self.mainSplitter.addWidget(self.first)
+        self.mainSplitter.addWidget(self.formDailySummary)
         #菜单默认展开
         self.mainSplitter.setSizes([1, 1]) 
 
@@ -100,7 +99,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def changeUI(self,name):
         if name == "REPORT":
             self.mainSplitter.widget(1).setParent(None)
-            self.mainSplitter.insertWidget(1, self.first)
+            self.mainSplitter.insertWidget(1, self.formDailySummary)
             self.handleLayout(self.mainSplitter)
  
         if name == "FUNCTION":
@@ -108,9 +107,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.mainSplitter.insertWidget(1, self.second)
             self.handleLayout(self.mainSplitter)
         
-class First(QWidget, Ui_First):
+class initDailySummary(QWidget, Ui_DailySummary):
     def __init__(self):
-        super(First,self).__init__()
+        super(initDailySummary,self).__init__()
         #子窗口初始化时实现子窗口布局
         self.initUI(self)
  

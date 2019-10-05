@@ -5,8 +5,8 @@ from DataFrameModel import PandasModel
 import pandas as pd
  
  
-class Ui_First(object):
-    def initUI(self, Ui_First):
+class Ui_DailySummary(object):
+    def initUI(self, Ui_DailySummary):
         #self.setStyleSheet("border-style:solid;border-width:2;border-color:red;")
 
         self.rptDate = ''
