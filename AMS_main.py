@@ -50,10 +50,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         btnFunc.setFixedHeight(40)
 
         #make splitter handle invisible
+        #不写这段代码macOS在handle处会有一条线，不清楚原因
+        #有了这个代码这条线消失，也不清楚原因
         menuSplitter.handle(1).setFixedHeight(1)
         menuSplitter.handle(2).setFixedHeight(1)
         menuSplitter.handle(3).setFixedHeight(1)
-
+        #分割线默认鼠标为拆分条，修改为无指针
+        menuSplitter.handle(1).setCursor(QtCore.Qt.BlankCursor)
+        menuSplitter.handle(2).setCursor(QtCore.Qt.BlankCursor)
+        menuSplitter.handle(3).setCursor(QtCore.Qt.BlankCursor)
+        
         #set menu button separate line format
         lblLogo.setStyleSheet("border-bottom-style:solid;border-bottom-width:1;border-bottom-color:white")
         btnReport.setStyleSheet("border-bottom-style:solid;border-bottom-width:1;border-bottom-color:white")
@@ -88,7 +94,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         button.setFixedSize(20,40)
         button.clicked.connect(lambda: self.handleSplitterButton(True)) 
         layout.addWidget(button)
-        handle.setLayout(layout) 
+        handle.setLayout(layout)
+        handle.setCursor(QtCore.Qt.PointingHandCursor)
 
     def handleSplitterButton(self, left=True): 
         if not all(self.mainSplitter.sizes()): 

@@ -4,71 +4,77 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from DataFrameModel import PandasModel
 import pandas as pd
  
- 
+
 class Ui_DailySummary(object):
     def initUI(self, Ui_DailySummary):
-        #self.setStyleSheet("border-style:solid;border-width:2;border-color:red;")
 
+        #初始化报告参数
         self.rptDate = ''
         self.rptAcct = ''
 
-        vLayout = QtWidgets.QVBoxLayout(self)
-        hLayout = QtWidgets.QHBoxLayout()
-        hLayout2 = QtWidgets.QHBoxLayout()
+        #初始化页面布局组件
+        mainLayout = QtWidgets.QVBoxLayout(self)
+        paraLayout = QtWidgets.QHBoxLayout()
+        rptLayout = QtWidgets.QHBoxLayout()
 
-        lblDate = QtWidgets.QLabel(self)
-        lblDate.setText('Date')
-        hLayout.addWidget(lblDate)
-
-        cal = QtWidgets.QCalendarWidget(self)
-        dtEdit = QtWidgets.QDateEdit(QtCore.QDate.currentDate(), self)
+        ########################################################
+        #设置参数内容与格局
+        #添加日期参数
+        labelDate = QtWidgets.QLabel('Date')
+        cal = QtWidgets.QCalendarWidget()
+        dtEdit = QtWidgets.QDateEdit(QtCore.QDate.currentDate())
         dtEdit.setCalendarPopup(True)
         dtEdit.setCalendarWidget(cal)
         dtEdit.setMaximumDate(QtCore.QDate.currentDate())
         dtEdit.setDate(cal.selectedDate())
-        dtEdit.dateChanged.connect(self.saveDate)
-        #dtEdit.setFixedWidth(120)
-        hLayout.addWidget(dtEdit)
 
-        lblAcct = QtWidgets.QLabel(self)
-        lblAcct.setText('Account')
-        hLayout.addWidget(lblAcct)
-
+        #添加账号参数
+        labelAcct = QtWidgets.QLabel('Account')
         comboAcct = QtWidgets.QComboBox()
         comboAcct.setEditable(True)
         comboAcct.lineEdit().setAlignment(QtCore.Qt.AlignLeft)
-        #comboAcct.lineEdit().setStyleSheet("text-align:center; vertical-align: middle;")
-        comboAcct.addItems(['Citic', 'CMB', 'ALL'])
-        comboAcct.currentTextChanged.connect(self.saveAcct)
-        #comboAcct.setFixedWidth(80)
-        #comboAcct.setStyleSheet("text-align:center; vertical-align: middle;")
-        comboAcct.setStyleSheet("background-color:white;")
-        hLayout.addWidget(comboAcct)
 
-        hLayout.addStretch(10)
+        #提取报告按钮
+        btnReport = QtWidgets.QPushButton("RUN REPORT")
 
-        btnReport = QtWidgets.QPushButton("RUN REPORT", self)
-        btnReport.clicked.connect(self.loadReport)
-        hLayout.addWidget(btnReport)
+        #设置参数布局内容
+        paraLayout.addWidget(labelDate)
+        paraLayout.addWidget(dtEdit)
+        paraLayout.addWidget(labelAcct)
+        paraLayout.addWidget(comboAcct)
+        paraLayout.addStretch(10)
+        paraLayout.addWidget(btnReport)
+        paraLayout.addStretch(1)
 
-        hLayout.addStretch(1)
+        ########################################################
+        #报告内容
+        self.tblHold = QtWidgets.QTableView()
+        rptLayout.addWidget(self.tblHold)
 
+        ########################################################
+        #设置页面主格局
         widget = QtWidgets.QWidget()
-        widget.setLayout(hLayout)
-        #widget.setFixedHeight(50)
+        widget.setLayout(paraLayout)
+        mainLayout.addWidget(widget)
+        #mainLayout.addLayout(paraLayout)
+        mainLayout.addLayout(rptLayout)
 
-        vLayout.addWidget(widget)
+        #设置默认参数
+        comboAcct.addItems(['Citic', 'CMB', 'ALL'])
 
-        hLayout.setContentsMargins(0, 0, 0, 0)
-        hLayout2.setContentsMargins(0, 0, 0, 0)
-        vLayout.setContentsMargins(0, 0, 0, 0)
-        vLayout.setSpacing(0)
+        #设置参数操作事件
+        dtEdit.dateChanged.connect(self.saveDate)
+        comboAcct.currentTextChanged.connect(self.saveAcct)
+        btnReport.clicked.connect(self.loadReport)
 
-        self.tblHold = QtWidgets.QTableView(self)
-        hLayout2.addWidget(self.tblHold)
+        #页面视觉调整
+        comboAcct.setStyleSheet("background-color:white;")
+        paraLayout.setContentsMargins(0, 0, 0, 0)
+        rptLayout.setContentsMargins(0, 0, 0, 0)
+        mainLayout.setContentsMargins(0, 0, 0, 0)
+        mainLayout.setSpacing(0)
 
-        vLayout.addLayout(hLayout2)
-
+        #提取默认参数值
         self.rptDate = dtEdit.date().toString('yyyyMMdd')
         self.rptAcct = comboAcct.currentText()
 
