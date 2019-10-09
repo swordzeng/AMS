@@ -5,8 +5,8 @@ from DataFrameModel import PandasModel
 import pandas as pd
  
 
-class Ui_DailySummary(object):
-    def initUI(self, Ui_DailySummary):
+class Ui_ReportTest(object):
+    def initUI(self, Ui_ReportTest):
 
         #初始化报告参数
         self.rptDate = ''
@@ -20,7 +20,7 @@ class Ui_DailySummary(object):
         ########################################################
         #设置参数内容与格局
         #添加日期参数
-        labelDate = QtWidgets.QLabel('Date')
+        labelDate = QtWidgets.QLabel('REPORT TEST')
         cal = QtWidgets.QCalendarWidget()
         dtEdit = QtWidgets.QDateEdit(QtCore.QDate.currentDate())
         dtEdit.setCalendarPopup(True)
