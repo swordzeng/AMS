@@ -44,8 +44,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         groupLayoutRpt.setAlignment(QtCore.Qt.AlignCenter)
         btnReportDailySummary = QtWidgets.QPushButton('REPORT SUMMARY')
         btnReportTest = QtWidgets.QPushButton('REPORT TEST')
+        btnReportTest.setFixedHeight(40)
         groupLayoutRpt.addWidget(btnReportDailySummary)
         groupLayoutRpt.addWidget(btnReportTest)
+        groupLayoutRpt.setSpacing(0)
 
         groupFunc = QtWidgets.QGroupBox()
         groupLayoutFunc = QtWidgets.QVBoxLayout(groupFunc)
@@ -88,13 +90,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #btnFunc.setStyleSheet("border-bottom-style:solid;border-bottom-width:1;border-bottom-color:white")
 
         menuSplitter.setStyleSheet('''
-            QPushButton{border:none;color:white;background-color:black}
+            QPushButton{border-style:solid;border-width:2;border-color:red;color:white;background-color:none}
             QLabel{border:none;background-color:grey}
-            QToolBox{border:none;background-color:black}
             QToolBoxButton{min-height:30}
-            QToolBox::tab{border:none;background-color:blue}
-            QGroupBox{border:none;background-color:black}
-            QFrame{border:none;background-color:black}
+            QToolBox::tab{border-style:solid;border-width:2;border-color:red;background-color:#87ba50}
+            QToolBox::tab:selected{border:none;background-color:#87ba50;background-image:url(current.png)}
+            QGroupBox{border-style:solid;border-width:2;border-color:red;background-color:blue}
+            QFrame{border:solid;background-color:black}
             ''')
 
         #connect button function

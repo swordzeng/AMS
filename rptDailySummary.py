@@ -83,6 +83,9 @@ class Ui_DailySummary(object):
         self.rptDate = dtEdit.date().toString('yyyyMMdd')
         self.rptAcct = comboAcct.currentText()
 
+        #btnFunc.setIcon(QtGui.QIcon("mesh.png"))
+        btnReport.setStyleSheet("background-image:url(current.png);background-color:#87ba50")
+
     def loadReport(self):
         df = pd.read_excel('A_Shares.xlsx',sheet_name='Trans')
         model = PandasModel(df)
