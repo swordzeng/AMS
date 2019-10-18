@@ -92,7 +92,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         menuSplitter.setStyleSheet('''
             QPushButton{border-style:solid;border-width:2;border-color:red;color:white;background-color:none}
             QLabel{border:none;background-color:grey}
-            QToolBoxButton{min-height:30}
+            QToolBoxButton{min-height:50;border-style:solid;border-width:2;border-color:red;}
             QToolBox::tab{border-style:solid;border-width:2;border-color:red;background-color:#87ba50}
             QToolBox::tab:selected{border:none;background-color:#87ba50;background-image:url(current.png)}
             QGroupBox{border-style:solid;border-width:2;border-color:red;background-color:blue}
