@@ -89,6 +89,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #btnReportDailySummary.setStyleSheet("border-bottom-style:solid;border-bottom-width:1;border-bottom-color:white")
         #btnFunc.setStyleSheet("border-bottom-style:solid;border-bottom-width:1;border-bottom-color:white")
 
+        #QMenu format sourcecode sample
+        #btnFunc.setStyleSheet('''
+        #    QMenu {border-radius:5px;font-family:SimHei;font-size:16px;}
+        #    QMenu::item {height:40px; width:120px;padding-left:30px;border: 1px solid none;}
+        #    QMenu::item:selected {background-color:rgb(0,120,215);padding-left:25px;border: 1px solid rgb(65,173,255);}
+        #    ''')
+
         menuSplitter.setStyleSheet('''
             QPushButton{border-style:solid;border-width:2;border-color:red;color:white;background-color:none}
             QLabel{border:none;background-color:grey}
