@@ -13,6 +13,18 @@ class Ui_MainWindow(QMainWindow):
         self.setWindowTitle('Asset Management System')
         self.resize(900,600)
 
+        #定义页面名称常量
+        self.UI_REPORT_SUMMARY = 'REPORT SUMMARY'
+        self.UI_REPORT_HOLDING = 'REPORT HOLDING ANALYSIS'
+        self.UI_FUNC_TRADE_ENTRY = 'FUNCTION TRANDE ENTRY'
+        self.UI_FUNC_TRADE_MGT = 'FUNCTION TRADE MANAGEMENT'
+
+        #初始化页面
+        self.formReportSummary = initDailySummary()
+        self.formReportHolding = initReportTest()
+        self.formFuncTradeEntry = Second()
+        self.formFuncTradeMgt = Second()
+
         #MainWindow已经有默认layout，不能直接set layout，不然会报警告
         mainWidget = QWidget()
         mainLayout = QVBoxLayout()
@@ -20,16 +32,9 @@ class Ui_MainWindow(QMainWindow):
         self.setCentralWidget(mainWidget)
 
         #创建页面容器并加载默认页面
-        self.formDailySummary = initDailySummary()
         self.mainSplitter = QSplitter(Qt.Horizontal) 
-        self.mainSplitter.addWidget(self.formDailySummary)
+        self.mainSplitter.addWidget(self.formReportSummary)
         mainLayout.addWidget(self.mainSplitter)
-
-        #定义页面名称常量
-        self.UI_REPORT_SUMMARY = 'REPORT SUMMARY'
-        self.UI_REPORT_HOLDING = 'REPORT HOLDING ANALYSIS'
-        self.UI_FUNC_TRADE_ENTRY = 'FUNCTION TRANDE ENTRY'
-        self.UI_FUNC_TRADE_MGT = 'FUNCTION TRADE MANAGEMENT'
 
         #############################################################
         ### 设置菜单栏
@@ -51,7 +56,7 @@ class Ui_MainWindow(QMainWindow):
 
         btnReport = QPushButton("报告生成")
         menuReport = QMenu()
-        actRptSummary = menuReport.addAction("概览", lambda:self.changeUI(self.UI_REPORT_SUMMARY))
+        menuReport.addAction("概览", lambda:self.changeUI(self.UI_REPORT_SUMMARY))
         menuReport.addAction("持仓分析",lambda:self.changeUI(self.UI_REPORT_HOLDING))
         btnReport.setMenu(menuReport)
 
@@ -88,13 +93,13 @@ class Ui_MainWindow(QMainWindow):
 
     def changeUI(self,name):
         if name == self.UI_REPORT_SUMMARY:
-            form = initDailySummary()
+            form = self.formReportSummary
         if name == self.UI_REPORT_HOLDING:
-            form = initReportTest()
+            form = self.formReportHolding
         if name == self.UI_FUNC_TRADE_ENTRY:
-            form = Second()
+            form = self.formFuncTradeEntry
         if name == self.UI_FUNC_TRADE_MGT:
-            form = Second()
+            form = self.formFuncTradeEntry
 
         self.mainSplitter.widget(0).setParent(None)
         self.mainSplitter.insertWidget(0, form)
