@@ -84,7 +84,7 @@ class Ui_DailySummary(object):
         self.rptAcct = comboAcct.currentText()
 
         #btnFunc.setIcon(QtGui.QIcon("mesh.png"))
-        btnReport.setStyleSheet("background-image:url(current.png);background-color:#87ba50")
+        btnReport.setStyleSheet("background-image:url(./logo/current.png);background-color:#87ba50")
 
     def loadReport(self):
         df = pd.read_excel('A_Shares.xlsx',sheet_name='Trans')

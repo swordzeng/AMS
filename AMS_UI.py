@@ -2,9 +2,10 @@ import sys
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from rptDailySummary import Ui_DailySummary
-from rptReportTest import Ui_ReportTest
-from second import Ui_Second
+from formRptDailySummary import Ui_DailySummary
+from formRptTest import Ui_ReportTest
+from formFuncTradeEntry import Ui_funcTradeEntry
+from formSecond import Ui_Second
 
 class Ui_MainWindow(QMainWindow):
     def __init__(self, parent=None):
@@ -17,13 +18,13 @@ class Ui_MainWindow(QMainWindow):
         self.UI_REPORT_SUMMARY = 'REPORT SUMMARY'
         self.UI_REPORT_HOLDING = 'REPORT HOLDING ANALYSIS'
         self.UI_FUNC_TRADE_ENTRY = 'FUNCTION TRANDE ENTRY'
-        self.UI_FUNC_TRADE_MGT = 'FUNCTION TRADE MANAGEMENT'
+        self.UI_FUNC_TRADE_ANALYSIS = 'FUNCTION TRADE ANALYSIS'
 
         #初始化页面
-        self.formReportSummary = initDailySummary()
-        self.formReportHolding = initReportTest()
-        self.formFuncTradeEntry = Second()
-        self.formFuncTradeMgt = Second()
+        self.formReportSummary = initRptDailySummary()
+        self.formReportHolding = initRptTest()
+        self.formFuncTradeEntry = initFuncTradeEntry()
+        self.formFuncTradeAnalysis = initSecond()
 
         #MainWindow已经有默认layout，不能直接set layout，不然会报警告
         mainWidget = QWidget()
@@ -42,7 +43,7 @@ class Ui_MainWindow(QMainWindow):
         menuBar = self.addToolBar('')
         menuBar.setMovable(False)
 
-        pixLogo = QPixmap('logo.png')
+        pixLogo = QPixmap('logo/logo.png')
         lblLogo = QLabel()
         lblLogo.setPixmap(pixLogo)
         lblLogo.setScaledContents(True)
@@ -63,7 +64,7 @@ class Ui_MainWindow(QMainWindow):
         btnFunc = QPushButton("交易管理")
         menuFunc = QMenu()
         menuFunc.addAction("交易录入",lambda:self.changeUI(self.UI_FUNC_TRADE_ENTRY))
-        menuFunc.addAction("交易查看",lambda:self.changeUI(self.UI_FUNC_TRADE_MGT))
+        menuFunc.addAction("交易分析",lambda:self.changeUI(self.UI_FUNC_TRADE_ANALYSIS))
         btnFunc.setMenu(menuFunc)
 
         btnSpace = QPushButton("")
@@ -98,31 +99,37 @@ class Ui_MainWindow(QMainWindow):
             form = self.formReportHolding
         if name == self.UI_FUNC_TRADE_ENTRY:
             form = self.formFuncTradeEntry
-        if name == self.UI_FUNC_TRADE_MGT:
-            form = self.formFuncTradeEntry
+        if name == self.UI_FUNC_TRADE_ANALYSIS:
+            form = self.formFuncTradeAnalysis
 
         self.mainSplitter.widget(0).setParent(None)
         self.mainSplitter.insertWidget(0, form)
 
-class initDailySummary(QWidget, Ui_DailySummary):
+class initRptDailySummary(QWidget, Ui_DailySummary):
     def __init__(self):
-        super(initDailySummary,self).__init__()
+        super(initRptDailySummary,self).__init__()
         #子窗口初始化时实现子窗口布局
         self.initUI(self)
 
-class initReportTest(QWidget, Ui_ReportTest):
+class initRptTest(QWidget, Ui_ReportTest):
     def __init__(self):
-        super(initReportTest,self).__init__()
+        super(initRptTest,self).__init__()
         self.initUI(self)
   
-class Second(QWidget, Ui_Second):
+class initFuncTradeEntry(QWidget, Ui_funcTradeEntry):
     def __init__(self):
-        super(Second,self).__init__()
+        super(initFuncTradeEntry,self).__init__()
+        self.initUI(self)
+
+class initSecond(QWidget, Ui_Second):
+    def __init__(self):
+        super(initSecond,self).__init__()
         self.initUI(self)
 
 if __name__ == '__main__':
     #字体大小自适应分辨率
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
+
     app = QApplication(sys.argv)
     ui = Ui_MainWindow()
     ui.show()
