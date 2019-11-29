@@ -1,37 +1,34 @@
 # -*- coding: utf-8 -*-
 
 import sys 
+import sqlite3
+import pandas.io.sql as sql
+from pandas import Series,DataFrame
+from DataFrameModel import PandasModel
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_funcTradeEntry(object):
     def initUI(self, Ui_funcTradeEntry):
         mainLayout = QtWidgets.QVBoxLayout()
-        #self.verticalLayoutR.setSpacing(0)
-        Frame = QtWidgets.QFrame()
-        Frame.setStyleSheet('''
-            QFrame{border-style:solid;border-width:2;border-color:red;}
-            QLabel{border-style:none;}
-            ''')
-        #self.exitFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        #self.exitFrame.setFrameShadow(QtWidgets.QFrame.Raised)
-        frameLayout = QtWidgets.QVBoxLayout(Frame)
-        exitBtn = QtWidgets.QPushButton("Exit")
-        label = QtWidgets.QLabel('This is 222')
-        frameLayout.addWidget(exitBtn)
-        frameLayout.addWidget(label)
+        
+        btnLoadData = QtWidgets.QPushButton("Load Data")
+        btnLoadData.clicked.connect(self.load_data)
 
-        hLayout = QtWidgets.QHBoxLayout()
-        label11 = QtWidgets.QLabel('111')
-        label22 = QtWidgets.QLabel('222')
-        hLayout.addWidget(label11)
-        hLayout.addWidget(label22)
-        frameLayout.addLayout(hLayout)
+        self.tableHold = QtWidgets.QTableView() 
 
-        frameLayout.addStretch(1)
-
-        label33 = QtWidgets.QLabel('333')
-        frameLayout.addWidget(label33)
-
-        mainLayout.addWidget(Frame)
-        mainLayout.setContentsMargins(0,0,0,0)
+        mainLayout.addWidget(btnLoadData)
+        mainLayout.addWidget(self.tableHold)
         self.setLayout(mainLayout)
+
+    def load_data(self):
+        print('load data')
+        con = sqlite3.connect('AMS.db')
+        query = "select * from Holding_Table"
+        cur = con.execute(query)
+        rows = cur.fetchall()
+        df = DataFrame(rows)
+        model = PandasModel(df)
+        self.tableHold.setModel(model)
+        self.tableHold.setSortingEnabled(True)
+        self.tableHold.horizontalHeader().setStyleSheet("QHeaderView::section {background-color:lightblue;color: black;padding-left: 4px;border: 1px solid #6c6c6c;font: bold;}")
+ 
