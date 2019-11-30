@@ -3,7 +3,7 @@
 import sys 
 import sqlite3
 import pandas.io.sql as sql
-from pandas import Series,DataFrame
+import pandas as pd
 from DataFrameModel import PandasModel
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -22,13 +22,12 @@ class Ui_funcTradeEntry(object):
 
     def load_data(self):
         print('load data')
-        con = sqlite3.connect('AMS.db')
+        db = sqlite3.connect('AMS.db')
         query = "select * from Holding_Table"
-        cur = con.execute(query)
-        rows = cur.fetchall()
-        df = DataFrame(rows)
+        df = pd.read_sql(query, con = db)
         model = PandasModel(df)
         self.tableHold.setModel(model)
+        self.tableHold.verticalHeader().setHidden(True)
         self.tableHold.setSortingEnabled(True)
+        self.tableHold.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         self.tableHold.horizontalHeader().setStyleSheet("QHeaderView::section {background-color:lightblue;color: black;padding-left: 4px;border: 1px solid #6c6c6c;font: bold;}")
- 

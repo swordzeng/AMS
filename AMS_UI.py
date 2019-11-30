@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import *
 from formRptDailySummary import Ui_DailySummary
 from formRptTest import Ui_ReportTest
 from formFuncTradeEntry import Ui_funcTradeEntry
+from formFuncSystemMgt import Ui_funcSystemMgt
 from formSecond import Ui_Second
 
 class Ui_MainWindow(QMainWindow):
@@ -19,11 +20,13 @@ class Ui_MainWindow(QMainWindow):
         self.UI_REPORT_HOLDING = 'REPORT HOLDING ANALYSIS'
         self.UI_FUNC_TRADE_ENTRY = 'FUNCTION TRANDE ENTRY'
         self.UI_FUNC_TRADE_ANALYSIS = 'FUNCTION TRADE ANALYSIS'
+        self.UI_FUNC_SYSTEM_MGT = "FUNCTION SYSMTEM MANAGEMENT"
 
         #初始化页面
         self.formReportSummary = initRptDailySummary()
         self.formReportHolding = initRptTest()
         self.formFuncTradeEntry = initFuncTradeEntry()
+        self.formFuncSystemMgt = initFuncSysMgt()
         self.formFuncTradeAnalysis = initSecond()
 
         #MainWindow已经有默认layout，不能直接set layout，不然会报警告
@@ -65,6 +68,7 @@ class Ui_MainWindow(QMainWindow):
         menuFunc = QMenu()
         menuFunc.addAction("交易录入",lambda:self.changeUI(self.UI_FUNC_TRADE_ENTRY))
         menuFunc.addAction("交易分析",lambda:self.changeUI(self.UI_FUNC_TRADE_ANALYSIS))
+        menuFunc.addAction("系统管理",lambda:self.changeUI(self.UI_FUNC_SYSTEM_MGT))
         btnFunc.setMenu(menuFunc)
 
         btnSpace = QPushButton("")
@@ -101,6 +105,8 @@ class Ui_MainWindow(QMainWindow):
             form = self.formFuncTradeEntry
         if name == self.UI_FUNC_TRADE_ANALYSIS:
             form = self.formFuncTradeAnalysis
+        if name == self.UI_FUNC_SYSTEM_MGT:
+            form = self.formFuncSystemMgt
 
         self.mainSplitter.widget(0).setParent(None)
         self.mainSplitter.insertWidget(0, form)
@@ -119,6 +125,11 @@ class initRptTest(QWidget, Ui_ReportTest):
 class initFuncTradeEntry(QWidget, Ui_funcTradeEntry):
     def __init__(self):
         super(initFuncTradeEntry,self).__init__()
+        self.initUI(self)
+
+class initFuncSysMgt(QWidget, Ui_funcSystemMgt):
+    def __init__(self):
+        super(initFuncSysMgt,self).__init__()
         self.initUI(self)
 
 class initSecond(QWidget, Ui_Second):
