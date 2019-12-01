@@ -95,7 +95,13 @@ class Ui_funcSystemMgt(object):
 
         tableView = QTableView()
 
-        layout.addLayout(gridInput)
+        hlayout.setContentsMargins(0,15,0,0)
+        gridInput.setVerticalSpacing(0)
+
+        widgetInput = QWidget()
+        widgetInput.setLayout(gridInput)
+        #widgetInput.setStyleSheet("background:blue")
+        layout.addWidget(widgetInput)
         layout.addWidget(tableView)
 
         strTable = "Symbol_Table"
@@ -114,44 +120,72 @@ class Ui_funcSystemMgt(object):
     def insertSymbol(self):
         print('insert symbol')
 
-    def updateSymbol(self):
-        print('update symbol')
-
-    def deleteSymbol(self):
+    def updateSymbol(self,table):
         btn = self.sender()
-        print('delete symbol ' + str(btn.property('row')))
+        print('update symbol ' + str(btn.property('code')))
+        print(table)
+
+    def deleteSymbol(self,table):
+        btn = self.sender()
+        print('delete symbol ' + str(btn.property('code')))
+        print(table)
 
     def load_data(self,tableWidget,tableName):
         db = sqlite3.connect('AMS.db')
         query = "select * from " + tableName
         df = pd.read_sql(query, con = db)
-        model = QStandardItemModel(df.shape[0],df.shape[1]+1) #多一列做操作按钮
+        rowCount = df.shape[0]
+        columnCount = df.shape[1]
+        model = QStandardItemModel(rowCount,columnCount+1) #多一列做操作按钮
         headName = list(df)
         headName.append('Action')
         model.setHorizontalHeaderLabels(headName)
-        for row in range(df.shape[0]):
-            for column in range(df.shape[1]):
+        for row in range(rowCount):
+            for column in range(columnCount):
                 item = QStandardItem()
                 itemValue = df.iloc[row,column]
-                item.setData(QVariant(itemValue), Qt.DisplayRole)
+                if type(itemValue).__name__ == 'int64':
+                    itemValue = int(itemValue)
+                if type(itemValue).__name__ == 'float64':
+                    itemValue = float(itemValue)
+                item.setData(itemValue, Qt.DisplayRole)
                 model.setItem(row, column, item)
 
         tableWidget.setModel(model)
 
-        for row in range(df.shape[0]):
-            btnDelete = QPushButton('Delete')
-            btnDelete.clicked.connect(self.deleteSymbol)
-            btnDelete.setProperty("row", df.iloc[row,0])
-            #btnDelete.setProperty("column", column)
-            tableWidget.setIndexWidget(model.index(row,df.shape[1]), btnDelete)
+        for row in range(rowCount):
+            iconDelete = QIcon()
+            iconDelete.addFile('logo/delete1.png')
+            btnDelete = QPushButton('')
+            btnDelete.setIcon(iconDelete)
+            btnDelete.clicked.connect(lambda:self.deleteSymbol(tableName))
+            btnDelete.setProperty("code", df.iloc[row,0])
+            
+            iconUpdate = QIcon()
+            iconUpdate.addFile("logo/edit2.png")
+            btnUpdate = QPushButton(iconUpdate, '')
+            btnUpdate.clicked.connect(lambda:self.updateSymbol(tableName))
+            btnUpdate.setProperty("code", df.iloc[row,0])
+
+            btnGroup = QGroupBox()
+            btnLayout = QHBoxLayout()
+            btnLayout.addWidget(btnDelete)
+            btnLayout.addWidget(btnUpdate)
+            btnLayout.setContentsMargins(0, 0, 0, 0)
+            btnLayout.setSpacing(1)
+            btnGroup.setLayout(btnLayout)
+            btnGroup.setStyleSheet('''
+                QPushButton{width:1;border:none}
+                QGroupBox{margin-top:0px;}
+                ''')
+            tableWidget.setIndexWidget(model.index(row,columnCount), btnGroup)
 
         #隐藏行号
         tableWidget.verticalHeader().setHidden(True)
         tableWidget.setSortingEnabled(True)
         #水平方向标签拓展剩下的窗口部分，填满表格
-        tableWidget.horizontalHeader().setStretchLastSection(True)
+        #tableWidget.horizontalHeader().setStretchLastSection(True)
         #水平方向，表格大小拓展到适当的尺寸      
         tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         tableWidget.horizontalHeader().setStyleSheet("QHeaderView::section {background-color:lightblue;color: black;padding-left: 4px;border: 1px solid #6c6c6c;font: bold;}")
         
-

@@ -37,7 +37,7 @@ class Ui_MainWindow(QMainWindow):
 
         #创建页面容器并加载默认页面
         self.mainSplitter = QSplitter(Qt.Horizontal) 
-        self.mainSplitter.addWidget(self.formReportSummary)
+        self.mainSplitter.addWidget(self.formFuncSystemMgt)
         mainLayout.addWidget(self.mainSplitter)
 
         #############################################################
