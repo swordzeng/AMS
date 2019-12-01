@@ -118,7 +118,8 @@ class Ui_funcSystemMgt(object):
         print('update symbol')
 
     def deleteSymbol(self):
-        print('delete symbol')
+        btn = self.sender()
+        print('delete symbol ' + str(btn.property('row')))
 
     def load_data(self,tableWidget,tableName):
         db = sqlite3.connect('AMS.db')
@@ -130,15 +131,20 @@ class Ui_funcSystemMgt(object):
         model.setHorizontalHeaderLabels(headName)
         for row in range(df.shape[0]):
             for column in range(df.shape[1]):
-                item = QStandardItem(str(df.iloc[row,column]))
+                item = QStandardItem()
+                itemValue = df.iloc[row,column]
+                item.setData(QVariant(itemValue), Qt.DisplayRole)
                 model.setItem(row, column, item)
 
-            btnDelete = QPushButton('Delete')
-            item = QStandardItem('Delete')
-            model.setItem(row, column+1, item)
-
-
         tableWidget.setModel(model)
+
+        for row in range(df.shape[0]):
+            btnDelete = QPushButton('Delete')
+            btnDelete.clicked.connect(self.deleteSymbol)
+            btnDelete.setProperty("row", df.iloc[row,0])
+            #btnDelete.setProperty("column", column)
+            tableWidget.setIndexWidget(model.index(row,df.shape[1]), btnDelete)
+
         #隐藏行号
         tableWidget.verticalHeader().setHidden(True)
         tableWidget.setSortingEnabled(True)
@@ -147,5 +153,5 @@ class Ui_funcSystemMgt(object):
         #水平方向，表格大小拓展到适当的尺寸      
         tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         tableWidget.horizontalHeader().setStyleSheet("QHeaderView::section {background-color:lightblue;color: black;padding-left: 4px;border: 1px solid #6c6c6c;font: bold;}")
-
+        
 
