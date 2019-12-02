@@ -13,7 +13,7 @@ class Ui_MainWindow(QMainWindow):
 
         QWidget.__init__(self, parent=None)
         self.setWindowTitle('Asset Management System')
-        self.resize(900,600)
+        self.resize(1200,700)
 
         #定义页面名称常量
         self.UI_REPORT_SUMMARY = 'REPORT SUMMARY'
@@ -37,7 +37,7 @@ class Ui_MainWindow(QMainWindow):
 
         #创建页面容器并加载默认页面
         self.mainSplitter = QSplitter(Qt.Horizontal) 
-        self.mainSplitter.addWidget(self.formFuncSystemMgt)
+        self.mainSplitter.addWidget(self.formFuncTradeEntry)
         mainLayout.addWidget(self.mainSplitter)
 
         #############################################################

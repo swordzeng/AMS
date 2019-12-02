@@ -2,9 +2,7 @@
 
 import sys 
 import sqlite3
-import pandas.io.sql as sql
 import pandas as pd
-from DataFrameModel import PandasModel
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -95,8 +93,8 @@ class Ui_funcSystemMgt(object):
 
         tableView = QTableView()
 
-        hlayout.setContentsMargins(0,15,0,0)
-        gridInput.setVerticalSpacing(0)
+        hlayout.setContentsMargins(0,10,0,0)
+        #gridInput.setVerticalSpacing(0)
 
         widgetInput = QWidget()
         widgetInput.setLayout(gridInput)
