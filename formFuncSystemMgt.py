@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import sys 
-import sqlite3
-import pandas as pd
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+import getData
 
 class Ui_funcSystemMgt(object):
     def initUI(self, Ui_funcSystemMgt):
@@ -103,8 +102,9 @@ class Ui_funcSystemMgt(object):
         layout.addWidget(tableView)
 
         strTable = "Symbol_Table"
-
-        self.load_data(tableView,strTable)
+        model = QStandardItemModel()
+        getData.load_table(tableView, model, strTable)
+        self.addActionColumn(tableView, model, strTable)
     
     def tabAcctUI(self):
         layout = QFormLayout()
@@ -128,62 +128,17 @@ class Ui_funcSystemMgt(object):
         print('delete symbol ' + str(btn.property('code')))
         print(table)
 
-    def load_data(self,tableWidget,tableName):
-        db = sqlite3.connect('AMS.db')
-        query = "select * from " + tableName
-        df = pd.read_sql(query, con = db)
-        rowCount = df.shape[0]
-        columnCount = df.shape[1]
-        model = QStandardItemModel(rowCount,columnCount+1) #多一列做操作按钮
-        headName = list(df)
-        headName.append('Action')
-        model.setHorizontalHeaderLabels(headName)
-        for row in range(rowCount):
-            for column in range(columnCount):
-                item = QStandardItem()
-                itemValue = df.iloc[row,column]
-                if type(itemValue).__name__ == 'int64':
-                    itemValue = int(itemValue)
-                if type(itemValue).__name__ == 'float64':
-                    itemValue = float(itemValue)
-                item.setData(itemValue, Qt.DisplayRole)
-                model.setItem(row, column, item)
+    def addActionColumn(self, tableView, model, tableName):
+        columnPos = model.columnCount() - 1
+        tableView.setColumnHidden(columnPos, False)
 
-        tableWidget.setModel(model)
-
+        rowCount = model.rowCount()
         for row in range(rowCount):
             iconDelete = QIcon()
             iconDelete.addFile('logo/delete1.png')
             btnDelete = QPushButton('')
             btnDelete.setIcon(iconDelete)
             btnDelete.clicked.connect(lambda:self.deleteSymbol(tableName))
-            btnDelete.setProperty("code", df.iloc[row,0])
-            
-            iconUpdate = QIcon()
-            iconUpdate.addFile("logo/edit2.png")
-            btnUpdate = QPushButton(iconUpdate, '')
-            btnUpdate.clicked.connect(lambda:self.updateSymbol(tableName))
-            btnUpdate.setProperty("code", df.iloc[row,0])
-
-            btnGroup = QGroupBox()
-            btnLayout = QHBoxLayout()
-            btnLayout.addWidget(btnDelete)
-            btnLayout.addWidget(btnUpdate)
-            btnLayout.setContentsMargins(0, 0, 0, 0)
-            btnLayout.setSpacing(1)
-            btnGroup.setLayout(btnLayout)
-            btnGroup.setStyleSheet('''
-                QPushButton{width:1;border:none}
-                QGroupBox{margin-top:0px;}
-                ''')
-            tableWidget.setIndexWidget(model.index(row,columnCount), btnGroup)
-
-        #隐藏行号
-        tableWidget.verticalHeader().setHidden(True)
-        tableWidget.setSortingEnabled(True)
-        #水平方向标签拓展剩下的窗口部分，填满表格
-        #tableWidget.horizontalHeader().setStretchLastSection(True)
-        #水平方向，表格大小拓展到适当的尺寸      
-        tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        tableWidget.horizontalHeader().setStyleSheet("QHeaderView::section {background-color:lightblue;color: black;padding-left: 4px;border: 1px solid #6c6c6c;font: bold;}")
-        
+            symbolCode = model.itemData(model.index(row,0))[0]  #返回dict类型
+            btnDelete.setProperty("code", symbolCode)    
+            tableView.setIndexWidget(model.index(row,columnPos), btnDelete)           
