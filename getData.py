@@ -10,7 +10,20 @@ def get_list(tableName, columnName):
     df = pd.read_sql(query, con = db)
     listValue = list(df[columnName])
 
-    return listValue
+    return listValuedic
+
+def insert_record(tableName, dictData):
+    columnName = ','.join(dictData.keys())
+    listData = dictData.values()
+    #给str类型加上单引号，然后将List转为字符串，转的过程中需要将数字转为字符串
+    columnData = list(map(lambda x: "'%s'"%x if type(x).__name__=='str' else x, listData))
+    columnData = ','.join('%s' %id for id in columnData)
+
+    db = db = sqlite3.connect('AMS.db')
+    cur = db.cursor()
+    query = "INSERT INTO {} ({}) VALUES ({})".format(tableName, columnName, columnData)
+    cur.execute(query)
+    db.commit()
 
 def load_table(tableView, model, tableName):
     db = sqlite3.connect('AMS.db')
@@ -43,5 +56,6 @@ def load_table(tableView, model, tableName):
     #tableWidget.horizontalHeader().setStretchLastSection(True)
     #水平方向，表格大小拓展到适当的尺寸      
     tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+    tableView.resizeColumnsToContents()
     tableView.horizontalHeader().setStyleSheet("QHeaderView::section {background-color:lightblue;color: black;padding-left: 4px;border: 1px solid #6c6c6c;font: bold;}")
     

@@ -41,6 +41,7 @@ class Ui_funcTradeEntry(object):
         labelBuySell = QLabel("Buy/Sell")
         labelOpenClose = QLabel("Open/Close")
         labelPrice = QLabel("Price")
+        labelCur = QLabel("Currency")
         labelQty = QLabel("Quantity")
         labelTradeAmt = QLabel("Trade Amt")
         labelCommission = QLabel("Commission")
@@ -55,6 +56,7 @@ class Ui_funcTradeEntry(object):
         self.BuySell = QComboBox()
         self.OpenClose = QComboBox()
         self.Price = QLineEdit()
+        self.Cur = QComboBox()
         self.Qty = QLineEdit()
         self.TradeAmt = QLineEdit()
         self.Commission = QLineEdit()
@@ -71,6 +73,7 @@ class Ui_funcTradeEntry(object):
         self.SymbolName.setStyleSheet("background-color:rgb(225,225,225)")
         self.OrderID.addItems(list(map(str,range(1,10))))
         self.TradeID.addItems(list(map(str,range(1,10))))
+        self.Cur.addItems(['HKD','CNY','USD'])
         self.BuySell.addItems(['Buy','Sell'])
         self.OpenClose.addItems(['Open','Close'])
         
@@ -83,6 +86,7 @@ class Ui_funcTradeEntry(object):
         self.TradeID.setStyleSheet("background-color:white")
         self.BuySell.setStyleSheet("background-color:white")
         self.OpenClose.setStyleSheet("background-color:white")
+        self.Cur.setStyleSheet("background-color:white")
         self.SymbolName.setStyleSheet("background-color:rgb(225,225,225)")
         self.TradeAmt.setStyleSheet("background-color:rgb(225,225,225)")
         self.SettleAmt.setStyleSheet("background-color:rgb(225,225,225)")
@@ -123,6 +127,8 @@ class Ui_funcTradeEntry(object):
         gridEdit.addWidget(self.Qty,1,9)
         gridEdit.addWidget(labelSettleAmt,1,10)
         gridEdit.addWidget(self.SettleAmt,1,11)
+        gridEdit.addWidget(labelCur,3,6)
+        gridEdit.addWidget(self.Cur,3,7)
         gridEdit.addWidget(labelCommission,3,8)
         gridEdit.addWidget(self.Commission,3,9)
 
@@ -153,6 +159,7 @@ class Ui_funcTradeEntry(object):
         self.Symbol = MySymbol(self.SymbolCode.currentText())
         self.SymbolName.setText(self.Symbol.Name)
         self.Commission.setText(str(self.Symbol.Commission))
+        self.Cur.setCurrentText(self.Symbol.curSettle)
 
     def amtCal(self):
         price = 0 if self.Price.text().strip()=='' else float(self.Price.text().strip())
