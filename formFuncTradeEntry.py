@@ -19,14 +19,16 @@ class Ui_funcTradeEntry(object):
         mainLayout.addWidget(self.widgetEdit)
         mainLayout.addWidget(self.tableView)
 
-        self.initEdit()
+        self.Symbol = MySymbol('')
 
+        self.initEdit()
+        self.fill_data()
+
+    def fill_data(self):
         strTable = "Order_Table"
         model = QStandardItemModel()
         getData.load_table(self.tableView, model, strTable)
         self.addActionColumn(self.tableView, model, strTable)
-
-        self.Symbol = MySymbol('')
 
     def initEdit(self):
         layout = QVBoxLayout()
@@ -67,6 +69,7 @@ class Ui_funcTradeEntry(object):
         self.Date.setCalendarWidget(cal)
         self.Date.setMaximumDate(QDate.currentDate())
         self.Date.setDate(cal.selectedDate())
+        self.Time.setDisplayFormat('HH:mm:ss')
         codeList = getData.get_list('Symbol_Table','SymbolCode')
         codeList.insert(0,'')
         self.SymbolCode.addItems(codeList)
@@ -154,6 +157,26 @@ class Ui_funcTradeEntry(object):
 
     def insertTrade(self):
         print('insert trade function')
+        dictData = {}
+        dictData['Date'] = self.Date.date().toString('yyyy-MM-dd')
+        dictData['Time']= self.Time.time().toString('HH:mm:ss')
+        dictData['SymbolCode'] = self.SymbolCode.currentText()
+        dictData['SymbolName'] = self.SymbolName.text()
+        dictData['OrderID'] = int(self.OrderID.currentText())
+        dictData['TradeID'] = int(self.TradeID.currentText())
+        dictData['BuySell'] = self.BuySell.currentText()
+        dictData['OpenClose'] = self.OpenClose.currentText()
+        dictData['CurTrade'] = self.Cur.currentText()
+        dictData['CurSettle'] = self.Cur.currentText()
+        dictData['Price'] = float(self.Price.text())
+        dictData['Qty'] = float(self.Qty.text())
+        dictData['Commission'] = float(self.Commission.text())
+        dictData['TradeAmt']    = float(self.TradeAmt.text())
+        dictData['SettleAmt'] = float(self.SettleAmt.text())
+        print(dictData)
+
+        getData.insert_record('Order_Table', dictData)
+        self.fill_data()
 
     def codeChanged(self):
         self.Symbol = MySymbol(self.SymbolCode.currentText())

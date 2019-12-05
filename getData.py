@@ -10,7 +10,7 @@ def get_list(tableName, columnName):
     df = pd.read_sql(query, con = db)
     listValue = list(df[columnName])
 
-    return listValuedic
+    return listValue
 
 def insert_record(tableName, dictData):
     columnName = ','.join(dictData.keys())
