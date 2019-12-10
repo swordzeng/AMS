@@ -25,9 +25,9 @@ class Ui_funcTradeEntry(object):
         vLayout = QVBoxLayout()
         vLayout.addWidget(self.tableDayPL,2)
         vLayout.addWidget(self.tableMonthPL,1)
-        hLayout.addWidget(self.tableTrade,2)
-        hLayout.addWidget(self.tableOrderPL,1)
-        hLayout.addLayout(vLayout,1)
+        hLayout.addWidget(self.tableTrade,5)
+        hLayout.addWidget(self.tableOrderPL,2)
+        hLayout.addLayout(vLayout,2)
         mainLayout.addLayout(hLayout)
 
         self.Symbol = MySymbol('')
@@ -39,7 +39,7 @@ class Ui_funcTradeEntry(object):
         db = sqlite3.connect('AMS.db')
         model = QStandardItemModel()
         query = """
-            SELECT Time,SymbolCode AS Symbol,OrderID,TradeID,BuySell AS BS,OpenClose AS OC,Price,Commission AS Comm
+            SELECT Time,SymbolCode AS Symbol,OrderID,TradeID,OpenClose AS OC,BuySell AS BS,Price,Qty,Commission AS Comm
             FROM Order_Table
             WHERE Date = '"""
         query = query + self.Date.date().toString('yyyy-MM-dd') + "'"

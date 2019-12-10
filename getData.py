@@ -3,6 +3,7 @@ import pandas as pd
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
+import time
 
 def get_list(tableName, columnName):
     db = sqlite3.connect('AMS.db')
@@ -25,10 +26,10 @@ def insert_record(tableName, dictData):
     cur.execute(query)
     db.commit()
 
-def load_table(tableView, model, tableName):
-    db = sqlite3.connect('AMS.db')
-    query = "select * from " + tableName
-    df = pd.read_sql(query, con = db)
+def load_table(tableView, model, df):
+    #db = sqlite3.connect('AMS.db')
+    #query = "select * from " + tableName + condition
+    #df = pd.read_sql(query, con = db)
     rowCount = df.shape[0]
     columnCount = df.shape[1]
     model.setRowCount = rowCount
@@ -39,11 +40,14 @@ def load_table(tableView, model, tableName):
     for row in range(rowCount):
         for column in range(columnCount):
             item = QStandardItem()
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             itemValue = df.iloc[row,column]
             if type(itemValue).__name__ == 'int64':
                 itemValue = int(itemValue)
             if type(itemValue).__name__ == 'float64':
                 itemValue = float(itemValue)
+                if itemValue < 0:
+                    item.setForeground(QBrush(QColor(255, 0, 0)))
             item.setData(itemValue, Qt.DisplayRole)
             model.setItem(row, column, item)
 
