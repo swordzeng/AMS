@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import sys 
+import sqlite3
+import pandas as pd
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -101,9 +103,12 @@ class Ui_funcSystemMgt(object):
         layout.addWidget(widgetInput)
         layout.addWidget(tableView)
 
+        db = sqlite3.connect('AMS.db')
         strTable = "Symbol_Table"
+        query = "SELECT * FROM Symbol_Table"
         model = QStandardItemModel()
-        getData.load_table(tableView, model, strTable)
+        df = pd.read_sql(query, con = db)
+        getData.load_table(tableView, model, df)
         self.addActionColumn(tableView, model, strTable)
     
     def tabAcctUI(self):

@@ -15,9 +15,20 @@ class Ui_funcTradeEntry(object):
         self.setLayout(mainLayout)
 
         self.widgetEdit = QWidget()
-        self.tableView = QTableView()
         mainLayout.addWidget(self.widgetEdit)
-        mainLayout.addWidget(self.tableView)
+
+        self.tableTrade = QTableView()
+        self.tableOrderPL = QTableView()
+        self.tableDayPL = QTableView()
+        self.tableMonthPL = QTableView()
+        hLayout = QHBoxLayout()
+        vLayout = QVBoxLayout()
+        vLayout.addWidget(self.tableDayPL,2)
+        vLayout.addWidget(self.tableMonthPL,1)
+        hLayout.addWidget(self.tableTrade,2)
+        hLayout.addWidget(self.tableOrderPL,1)
+        hLayout.addLayout(vLayout,1)
+        mainLayout.addLayout(hLayout)
 
         self.Symbol = MySymbol('')
 
@@ -25,10 +36,39 @@ class Ui_funcTradeEntry(object):
         self.fill_data()
 
     def fill_data(self):
-        strTable = "Order_Table"
+        db = sqlite3.connect('AMS.db')
         model = QStandardItemModel()
-        getData.load_table(self.tableView, model, strTable)
-        self.addActionColumn(self.tableView, model, strTable)
+        query = """
+            SELECT Time,SymbolCode AS Symbol,OrderID,TradeID,BuySell AS BS,OpenClose AS OC,Price,Commission AS Comm
+            FROM Order_Table
+            WHERE Date = '"""
+        query = query + self.Date.date().toString('yyyy-MM-dd') + "'"
+        df = pd.read_sql(query, con = db)
+        getData.load_table(self.tableTrade, model, df)
+        self.tableTrade.sortByColumn(0,0)
+        #self.addActionColumn(self.tableView, model, strTable)
+
+        query = "SELECT * FROM Order_Table"
+        dfAll = pd.read_sql(query, con=db)
+        dfAll['DateTime'] = pd.to_datetime(dfAll['Date'])
+        dfAll['Year'] = dfAll['DateTime'].dt.year
+        dfAll['Month'] = dfAll['DateTime'].dt.month
+        dfAll['Day'] = dfAll['DateTime'].dt.day
+        dfMonth = dfAll[(dfAll['Year']==self.Date.date().year()) & (dfAll['Month']==self.Date.date().month())]
+        dfOrderPL = dfMonth.groupby(['Date','OrderID'])[['SettleAmt']].sum()
+        dfDayPL = dfMonth.groupby(['Date'])[['SettleAmt']].sum()
+        dfMonthPL = dfAll.groupby(['Year','Month'])[['SettleAmt']].sum()
+
+        modelOrderPL = QStandardItemModel()
+        modelDayPL = QStandardItemModel()
+        modelMonthPL  = QStandardItemModel()
+
+        dfOrderPL.reset_index(inplace =True)
+        dfDayPL.reset_index(inplace =True)
+        dfMonthPL.reset_index(inplace =True)
+        getData.load_table(self.tableOrderPL, modelOrderPL, dfOrderPL)
+        getData.load_table(self.tableDayPL, modelDayPL, dfDayPL)
+        getData.load_table(self.tableMonthPL, modelMonthPL, dfMonthPL)
 
     def initEdit(self):
         layout = QVBoxLayout()
@@ -37,11 +77,9 @@ class Ui_funcTradeEntry(object):
         labelDate = QLabel("Date")
         labelTime = QLabel("Time")
         labelSymbolCode = QLabel("Symbol Code")
-        labelSymbolName = QLabel("Symbol Name")
         labelOrderID = QLabel("Order ID")
         labelTradeID = QLabel("Trade ID")
         labelBuySell = QLabel("Buy/Sell")
-        labelOpenClose = QLabel("Open/Close")
         labelPrice = QLabel("Price")
         labelCur = QLabel("Currency")
         labelQty = QLabel("Quantity")
@@ -52,17 +90,15 @@ class Ui_funcTradeEntry(object):
         self.Date = QDateEdit(QDate.currentDate())
         self.Time = QTimeEdit(QTime.currentTime())
         self.SymbolCode = QComboBox()
-        self.SymbolName = QLineEdit()
         self.OrderID = QComboBox()
         self.TradeID = QComboBox()
         self.BuySell = QComboBox()
-        self.OpenClose = QComboBox()
-        self.Price = QLineEdit()
+        self.Price = QLineEdit('0')
         self.Cur = QComboBox()
-        self.Qty = QLineEdit()
-        self.TradeAmt = QLineEdit()
-        self.Commission = QLineEdit()
-        self.SettleAmt = QLineEdit()
+        self.Qty = QLineEdit('0')
+        self.TradeAmt = QLineEdit('0')
+        self.Commission = QLineEdit('0')
+        self.SettleAmt = QLineEdit('0')
 
         cal = QCalendarWidget()
         self.Date.setCalendarPopup(True)
@@ -73,14 +109,11 @@ class Ui_funcTradeEntry(object):
         codeList = getData.get_list('Symbol_Table','SymbolCode')
         codeList.insert(0,'')
         self.SymbolCode.addItems(codeList)
-        self.SymbolName.setStyleSheet("background-color:rgb(225,225,225)")
         self.OrderID.addItems(list(map(str,range(1,10))))
         self.TradeID.addItems(list(map(str,range(1,10))))
         self.Cur.addItems(['HKD','CNY','USD'])
-        self.BuySell.addItems(['Buy','Sell'])
-        self.OpenClose.addItems(['Open','Close'])
-        
-        self.SymbolName.setReadOnly(True)
+        self.BuySell.addItems(['Open-Buy','Open-Sell','Close-Buy','Close-Sell'])
+
         self.TradeAmt.setReadOnly(True)
         self.SettleAmt.setReadOnly(True)
         
@@ -88,9 +121,7 @@ class Ui_funcTradeEntry(object):
         self.OrderID.setStyleSheet("background-color:white")
         self.TradeID.setStyleSheet("background-color:white")
         self.BuySell.setStyleSheet("background-color:white")
-        self.OpenClose.setStyleSheet("background-color:white")
         self.Cur.setStyleSheet("background-color:white")
-        self.SymbolName.setStyleSheet("background-color:rgb(225,225,225)")
         self.TradeAmt.setStyleSheet("background-color:rgb(225,225,225)")
         self.SettleAmt.setStyleSheet("background-color:rgb(225,225,225)")
 
@@ -112,28 +143,28 @@ class Ui_funcTradeEntry(object):
         gridEdit.addWidget(self.SymbolCode,0,3)
         gridEdit.addWidget(labelOrderID,0,4)
         gridEdit.addWidget(self.OrderID,0,5)
-        gridEdit.addWidget(labelBuySell,0,6)
-        gridEdit.addWidget(self.BuySell,0,7)
-        gridEdit.addWidget(labelPrice,0,8)
-        gridEdit.addWidget(self.Price,0,9)
+        gridEdit.addWidget(labelPrice,0,6)
+        gridEdit.addWidget(self.Price,0,7)
+        gridEdit.addWidget(labelQty,0,8)
+        gridEdit.addWidget(self.Qty,0,9)
         gridEdit.addWidget(labelTradeAmt,0,10)
         gridEdit.addWidget(self.TradeAmt,0,11)
         gridEdit.addWidget(labelTime,1,0)
         gridEdit.addWidget(self.Time,1,1)
-        gridEdit.addWidget(labelSymbolName,1,2)
-        gridEdit.addWidget(self.SymbolName,1,3)
+        gridEdit.addWidget(labelBuySell,1,2)
+        gridEdit.addWidget(self.BuySell,1,3)
         gridEdit.addWidget(labelTradeID,1,4)
         gridEdit.addWidget(self.TradeID,1,5)
-        gridEdit.addWidget(labelOpenClose,1,6)
-        gridEdit.addWidget(self.OpenClose,1,7)
-        gridEdit.addWidget(labelQty,1,8)
-        gridEdit.addWidget(self.Qty,1,9)
+        gridEdit.addWidget(labelCur,1,6)
+        gridEdit.addWidget(self.Cur,1,7)
+        gridEdit.addWidget(labelCommission,1,8)
+        gridEdit.addWidget(self.Commission,1,9)
         gridEdit.addWidget(labelSettleAmt,1,10)
         gridEdit.addWidget(self.SettleAmt,1,11)
-        gridEdit.addWidget(labelCur,3,6)
-        gridEdit.addWidget(self.Cur,3,7)
-        gridEdit.addWidget(labelCommission,3,8)
-        gridEdit.addWidget(self.Commission,3,9)
+
+        btnInsert = QPushButton('INSERT')
+        btnInsert.clicked.connect(self.insertTrade)
+        gridEdit.addWidget(btnInsert,3,10,1,2)
 
         gridEdit.setColumnStretch(0,1)
         gridEdit.setColumnStretch(1,2)
@@ -147,11 +178,7 @@ class Ui_funcTradeEntry(object):
         gridEdit.setColumnStretch(9,2)
         gridEdit.setColumnStretch(10,1)
         gridEdit.setColumnStretch(11,2)
-        gridEdit.setHorizontalSpacing(15)
-
-        btnInsert = QPushButton('INSERT')
-        btnInsert.clicked.connect(self.insertTrade)
-        gridEdit.addWidget(btnInsert,3,11)
+        #gridEdit.setHorizontalSpacing(15)
 
         layout.addLayout(gridEdit)
 
@@ -161,11 +188,12 @@ class Ui_funcTradeEntry(object):
         dictData['Date'] = self.Date.date().toString('yyyy-MM-dd')
         dictData['Time']= self.Time.time().toString('HH:mm:ss')
         dictData['SymbolCode'] = self.SymbolCode.currentText()
-        dictData['SymbolName'] = self.SymbolName.text()
+        dictData['SymbolName'] = self.Symbol.Name
         dictData['OrderID'] = int(self.OrderID.currentText())
         dictData['TradeID'] = int(self.TradeID.currentText())
-        dictData['BuySell'] = self.BuySell.currentText()
-        dictData['OpenClose'] = self.OpenClose.currentText()
+        strBuySell = self.BuySell.currentText()
+        dictData['BuySell'] = strBuySell[0:strBuySell.find('-')]
+        dictData['OpenClose'] =  strBuySell[-strBuySell.find('-'):]
         dictData['CurTrade'] = self.Cur.currentText()
         dictData['CurSettle'] = self.Cur.currentText()
         dictData['Price'] = float(self.Price.text())
@@ -180,7 +208,6 @@ class Ui_funcTradeEntry(object):
 
     def codeChanged(self):
         self.Symbol = MySymbol(self.SymbolCode.currentText())
-        self.SymbolName.setText(self.Symbol.Name)
         self.Commission.setText(str(self.Symbol.Commission))
         self.Cur.setCurrentText(self.Symbol.curSettle)
 
@@ -191,7 +218,9 @@ class Ui_funcTradeEntry(object):
         
         amtTrade = price * qty * self.Symbol.Multiplier
 
-        if self.BuySell.currentText() == 'Buy':
+        strBuySell = self.BuySell.currentText()
+        strBuySell = strBuySell[0:strBuySell.find('-')]
+        if strBuySell == 'Buy':
             amtSettle = -1 * (amtTrade + qty * comm)
         else:
             amtSettle = amtTrade - qty * comm
