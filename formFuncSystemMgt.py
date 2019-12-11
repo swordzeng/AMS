@@ -11,6 +11,9 @@ import getData
 class Ui_funcSystemMgt(object):
     def initUI(self, Ui_funcSystemMgt):
 
+        self.db = sqlite3.connect('AMS.db')
+        self.tableView = QTableView()
+
         mainLayout = QVBoxLayout()
         self.setLayout(mainLayout)
 
@@ -31,44 +34,46 @@ class Ui_funcSystemMgt(object):
         self.tabSymbol.setLayout(layout)
 
         labelSymbolCode = QLabel('Symbol Code')
-        editSymbolCode = QLineEdit()
         labelSymbolName = QLabel('Symbol Name')
-        editSymbolName = QLineEdit()
         labelUnderly = QLabel('Underlying')
-        editUnderly = QComboBox()
-        editUnderly.addItems(['','MHI'])
         labelAsset = QLabel('Asset Class')
-        editAsset = QComboBox()
-        editAsset.addItems(['Stock','Future','ETF'])
         labelExchange = QLabel('Exchange')
-        editExchange = QComboBox()
-        editExchange.addItems(['SSE','SZ','HKEx','HKFE'])
         labelCur = QLabel('Currency')
-        editCur = QComboBox()
-        editCur.addItems(['CNY','HKD','USD'])
         labelMultiplier = QLabel('Multiplier')
-        editMultiplier = QLineEdit()
         labelCommission = QLabel('Commission')
-        editCommission = QLineEdit()
+
+        self.editSymbolCode = QLineEdit()
+        self.editSymbolName = QLineEdit()
+        self.editUnderly = QComboBox()
+        self.editAsset = QComboBox()
+        self.editExchange = QComboBox()
+        self.editCur = QComboBox()
+        self.editMultiplier = QLineEdit('1')
+        self.editCommission = QLineEdit('0')
+
+        self.editUnderly.addItems(['','MHI'])
+        self.editAsset.addItems(['Stock','Future','ETF'])
+        self.editExchange.addItems(['SSE','SZ','HKEx','HKFE'])
+        self.editCur.addItems(['CNY','HKD','USD'])
 
         #layoutInput = QHBoxLayout()
         gridInput = QGridLayout()
         gridInput.addWidget(labelSymbolCode,0,0)
-        gridInput.addWidget(editSymbolCode,0,1)
+        gridInput.addWidget(self.editSymbolCode,0,1)
         gridInput.addWidget(labelSymbolName,1,0)
-        gridInput.addWidget(editSymbolName,1,1)
+        gridInput.addWidget(self.editSymbolName,1,1)
         gridInput.addWidget(labelUnderly,0,2)
-        gridInput.addWidget(editUnderly,0,3)
+        gridInput.addWidget(self.editUnderly,0,3)
         gridInput.addWidget(labelAsset,1,2)
-        gridInput.addWidget(editAsset,1,3)
+        gridInput.addWidget(self.editAsset,1,3)
         gridInput.addWidget(labelExchange,0,4)
-        gridInput.addWidget(editExchange,0,5)
+        gridInput.addWidget(self.editExchange,0,5)
         gridInput.addWidget(labelCur,1,4)
-        gridInput.addWidget(editCur,1,5)
+        gridInput.addWidget(self.editCur,1,5)
         gridInput.addWidget(labelMultiplier,0,6)
-        gridInput.addWidget(editMultiplier,0,7)
+        gridInput.addWidget(self.editMultiplier,0,7)
         gridInput.addWidget(labelCommission,1,6)
-        gridInput.addWidget(editCommission,1,7)
+        gridInput.addWidget(self.editCommission,1,7)
         gridInput.setColumnStretch(0,1)
         gridInput.setColumnStretch(1,1)
         gridInput.setColumnStretch(2,1)
@@ -81,18 +86,13 @@ class Ui_funcSystemMgt(object):
 
         btnAdd = QPushButton('Insert')
         btnUpdate = QPushButton('Update')
-        btnDelete = QPushButton('Detele')
         btnAdd.clicked.connect(self.insertSymbol)
         btnUpdate.clicked.connect(self.updateSymbol)
-        btnDelete.clicked.connect(self.deleteSymbol)
         hlayout = QHBoxLayout()
         hlayout.addStretch(5)
         hlayout.addWidget(btnAdd)
         hlayout.addWidget(btnUpdate)
-        hlayout.addWidget(btnDelete)
         gridInput.addLayout(hlayout,2,0,1,8)
-
-        tableView = QTableView()
 
         hlayout.setContentsMargins(0,10,0,0)
         #gridInput.setVerticalSpacing(0)
@@ -101,16 +101,18 @@ class Ui_funcSystemMgt(object):
         widgetInput.setLayout(gridInput)
         #widgetInput.setStyleSheet("background:blue")
         layout.addWidget(widgetInput)
-        layout.addWidget(tableView)
+        layout.addWidget(self.tableView)
 
-        db = sqlite3.connect('AMS.db')
+        self.fill_data()
+
+    def fill_data(self):
         strTable = "Symbol_Table"
         query = "SELECT * FROM Symbol_Table"
         model = QStandardItemModel()
-        df = pd.read_sql(query, con = db)
-        getData.load_table(tableView, model, df)
-        self.addActionColumn(tableView, model, strTable)
-    
+        df = pd.read_sql(query, con = self.db)
+        getData.load_table(self.tableView, model, df)
+        self.addActionColumn(self.tableView, model, strTable)
+
     def tabAcctUI(self):
         layout = QFormLayout()
         sex = QHBoxLayout()
@@ -121,7 +123,25 @@ class Ui_funcSystemMgt(object):
         self.tabAcct.setLayout(layout)
 
     def insertSymbol(self):
-        print('insert symbol')
+        if self.editSymbolCode.text().strip() != '':
+            query = "SELECT * FROM Symbol_Table WHERE SymbolCode = '" + self.editSymbolCode.text().strip() + "'"
+            df = pd.read_sql(query, con = self.db)
+
+            if df.empty:
+                dictSymbol = {}
+                dictSymbol['SymbolCode'] = self.editSymbolCode.text().strip()
+                dictSymbol['SymbolName'] = self.editSymbolName.text().strip()
+                dictSymbol['Exchange'] = self.editExchange.currentText()
+                dictSymbol['Underlying'] = self.editUnderly.currentText()
+                dictSymbol['AssetClass'] = self.editAsset.currentText()
+                dictSymbol['CurTrade'] = self.editCur.currentText()
+                dictSymbol['CurSettle'] = self.editCur.currentText()
+                dictSymbol['Multiplier'] = self.editMultiplier.text().strip()
+                dictSymbol['Commission'] = self.editCommission.text().strip()
+                getData.insert_record('Symbol_Table', dictSymbol)
+                self.fill_data()
+            else:
+                print('symbol exist')
 
     def updateSymbol(self,table):
         btn = self.sender()
@@ -130,8 +150,14 @@ class Ui_funcSystemMgt(object):
 
     def deleteSymbol(self,table):
         btn = self.sender()
-        print('delete symbol ' + str(btn.property('code')))
-        print(table)
+        query = "DELETE FROM " + table + " WHERE SymbolCode = '" + str(btn.property('code')) + "'"
+        print(query)
+        cursor = self.db.cursor()
+        cursor.execute(query)
+        self.db.commit()
+        cursor.close()
+
+        self.fill_data()
 
     def addActionColumn(self, tableView, model, tableName):
         columnPos = model.columnCount() - 1

@@ -41,11 +41,10 @@ class Ui_funcTradeEntry(object):
         query = """
             SELECT Time,SymbolCode AS Symbol,OrderID,TradeID,OpenClose AS OC,BuySell AS BS,Price,Qty,Commission AS Comm
             FROM Order_Table
-            WHERE Date = '"""
+            WHERE AccountID = 'IB' and Date = '"""
         query = query + self.Date.date().toString('yyyy-MM-dd') + "'"
         df = pd.read_sql(query, con = db)
         getData.load_table(self.tableTrade, model, df)
-        self.tableTrade.sortByColumn(0,0)
         #self.addActionColumn(self.tableView, model, strTable)
 
         query = "SELECT * FROM Order_Table"
@@ -64,11 +63,16 @@ class Ui_funcTradeEntry(object):
         modelMonthPL  = QStandardItemModel()
 
         dfOrderPL.reset_index(inplace =True)
+        dfOrderPL.sort_values(by=['Date', 'OrderID'], ascending=False, inplace=True)
         dfDayPL.reset_index(inplace =True)
+        dfDayPL.sort_values(by='Date', ascending=False, inplace=True)
         dfMonthPL.reset_index(inplace =True)
+        dfMonthPL.sort_values(by=['Year', 'Month'], ascending=False, inplace=True)
         getData.load_table(self.tableOrderPL, modelOrderPL, dfOrderPL)
         getData.load_table(self.tableDayPL, modelDayPL, dfDayPL)
         getData.load_table(self.tableMonthPL, modelMonthPL, dfMonthPL)
+
+        self.tableTrade.sortByColumn(0,0)
 
     def initEdit(self):
         layout = QVBoxLayout()
@@ -108,6 +112,7 @@ class Ui_funcTradeEntry(object):
         self.Time.setDisplayFormat('HH:mm:ss')
         codeList = getData.get_list('Symbol_Table','SymbolCode')
         codeList.insert(0,'')
+        codeList = [str(i) for i in codeList]
         self.SymbolCode.addItems(codeList)
         self.OrderID.addItems(list(map(str,range(1,10))))
         self.TradeID.addItems(list(map(str,range(1,10))))
@@ -183,17 +188,17 @@ class Ui_funcTradeEntry(object):
         layout.addLayout(gridEdit)
 
     def insertTrade(self):
-        print('insert trade function')
         dictData = {}
+        dictData['AccountID'] = 'IB'
         dictData['Date'] = self.Date.date().toString('yyyy-MM-dd')
         dictData['Time']= self.Time.time().toString('HH:mm:ss')
         dictData['SymbolCode'] = self.SymbolCode.currentText()
         dictData['SymbolName'] = self.Symbol.Name
         dictData['OrderID'] = int(self.OrderID.currentText())
         dictData['TradeID'] = int(self.TradeID.currentText())
-        strBuySell = self.BuySell.currentText()
-        dictData['BuySell'] = strBuySell[0:strBuySell.find('-')]
-        dictData['OpenClose'] =  strBuySell[-strBuySell.find('-'):]
+        listBuySell = self.BuySell.currentText().split('-')
+        dictData['BuySell'] = listBuySell[1]
+        dictData['OpenClose'] =  listBuySell[0]
         dictData['CurTrade'] = self.Cur.currentText()
         dictData['CurSettle'] = self.Cur.currentText()
         dictData['Price'] = float(self.Price.text())
@@ -201,7 +206,6 @@ class Ui_funcTradeEntry(object):
         dictData['Commission'] = float(self.Commission.text())
         dictData['TradeAmt']    = float(self.TradeAmt.text())
         dictData['SettleAmt'] = float(self.SettleAmt.text())
-        print(dictData)
 
         getData.insert_record('Order_Table', dictData)
         self.fill_data()
@@ -218,8 +222,7 @@ class Ui_funcTradeEntry(object):
         
         amtTrade = price * qty * self.Symbol.Multiplier
 
-        strBuySell = self.BuySell.currentText()
-        strBuySell = strBuySell[0:strBuySell.find('-')]
+        strBuySell = self.BuySell.currentText().split('-')[1]
         if strBuySell == 'Buy':
             amtSettle = -1 * (amtTrade + qty * comm)
         else:

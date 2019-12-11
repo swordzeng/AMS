@@ -66,8 +66,8 @@ class Ui_MainWindow(QMainWindow):
 
         btnFunc = QPushButton("交易管理")
         menuFunc = QMenu()
-        menuFunc.addAction("交易录入",lambda:self.changeUI(self.UI_FUNC_TRADE_ENTRY))
-        menuFunc.addAction("交易分析",lambda:self.changeUI(self.UI_FUNC_TRADE_ANALYSIS))
+        menuFunc.addAction("期货分析",lambda:self.changeUI(self.UI_FUNC_TRADE_ENTRY))
+        menuFunc.addAction("股票分析",lambda:self.changeUI(self.UI_FUNC_TRADE_ANALYSIS))
         menuFunc.addAction("系统管理",lambda:self.changeUI(self.UI_FUNC_SYSTEM_MGT))
         btnFunc.setMenu(menuFunc)
 
