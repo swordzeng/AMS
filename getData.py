@@ -9,6 +9,8 @@ def get_list(tableName, columnName):
     db = sqlite3.connect('AMS.db')
     query = "select distinct {} from {} order by {}".format(columnName, tableName, columnName)
     df = pd.read_sql(query, con = db)
+    df.dropna(axis = 0, inplace=True)   #去掉空值
+    df=df[~df[columnName].isin([''])]   #去掉空字符串
     listValue = list(df[columnName])
 
     return listValue

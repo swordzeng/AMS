@@ -255,7 +255,7 @@ class MySymbol:
         if not df.empty:
             self.Code = df.iloc[0]['SymbolCode']
             self.Name = df.iloc[0]['SymbolName']
-            self.Exchange = df.iloc[0]['Exchange']
+            self.Market = df.iloc[0]['Market']
             self.Underly = df.iloc[0]['Underlying']
             self.AssetClass = df.iloc[0]['AssetClass']
             self.CurTrade = df.iloc[0]['CurTrade']
@@ -265,7 +265,7 @@ class MySymbol:
         else:
             self.Code = ''
             self.Name = ''
-            self.Exchange = ''
+            self.Market = ''
             self.Underly = ''
             self.AssetClass = ''
             self.CurTrade = ''
