@@ -8,8 +8,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import getData
 
-class Ui_funcTradeEntry(object):
-    def initUI(self, Ui_funcTradeEntry):
+class Ui_funcTradeAnalysis(object):
+    def initUI(self, Ui_funcTradeAnalysis):
 
         mainLayout = QVBoxLayout()
         self.setLayout(mainLayout)

@@ -4,7 +4,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from formRptDailySummary import Ui_DailySummary
 from formRptTest import Ui_ReportTest
-from formFuncTradeEntry import Ui_funcTradeEntry
+from formFuncTradeAnalysis import Ui_funcTradeAnalysis
 from formFuncSystemMgt import Ui_funcSystemMgt
 from formSecond import Ui_Second
 
@@ -25,9 +25,9 @@ class Ui_MainWindow(QMainWindow):
         #初始化页面
         self.formReportSummary = initRptDailySummary()
         self.formReportHolding = initRptTest()
-        self.formFuncTradeEntry = initFuncTradeEntry()
+        self.formFuncTradeEntry = initSecond()
         self.formFuncSystemMgt = initFuncSysMgt()
-        self.formFuncTradeAnalysis = initSecond()
+        self.formFuncTradeAnalysis = initFuncTradeAnalysis()
 
         #MainWindow已经有默认layout，不能直接set layout，不然会报警告
         mainWidget = QWidget()
@@ -37,7 +37,7 @@ class Ui_MainWindow(QMainWindow):
 
         #创建页面容器并加载默认页面
         self.mainSplitter = QSplitter(Qt.Horizontal) 
-        self.mainSplitter.addWidget(self.formFuncTradeEntry)
+        self.mainSplitter.addWidget(self.formFuncTradeAnalysis)
         mainLayout.addWidget(self.mainSplitter)
 
         #############################################################
@@ -58,16 +58,16 @@ class Ui_MainWindow(QMainWindow):
         spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         menuBar.addWidget(spacer)
 
-        btnReport = QPushButton("报告生成")
+        btnReport = QPushButton("报告报告")
         menuReport = QMenu()
         menuReport.addAction("概览", lambda:self.changeUI(self.UI_REPORT_SUMMARY))
         menuReport.addAction("持仓分析",lambda:self.changeUI(self.UI_REPORT_HOLDING))
+        menuReport.addAction("期货分析",lambda:self.changeUI(self.UI_FUNC_TRADE_ANALYSIS))
         btnReport.setMenu(menuReport)
 
-        btnFunc = QPushButton("交易管理")
+        btnFunc = QPushButton("系统管理")
         menuFunc = QMenu()
-        menuFunc.addAction("期货分析",lambda:self.changeUI(self.UI_FUNC_TRADE_ENTRY))
-        menuFunc.addAction("股票分析",lambda:self.changeUI(self.UI_FUNC_TRADE_ANALYSIS))
+        menuFunc.addAction("交易管理",lambda:self.changeUI(self.UI_FUNC_TRADE_ENTRY))
         menuFunc.addAction("系统管理",lambda:self.changeUI(self.UI_FUNC_SYSTEM_MGT))
         btnFunc.setMenu(menuFunc)
 
@@ -122,9 +122,9 @@ class initRptTest(QWidget, Ui_ReportTest):
         super(initRptTest,self).__init__()
         self.initUI(self)
   
-class initFuncTradeEntry(QWidget, Ui_funcTradeEntry):
+class initFuncTradeAnalysis(QWidget, Ui_funcTradeAnalysis):
     def __init__(self):
-        super(initFuncTradeEntry,self).__init__()
+        super(initFuncTradeAnalysis,self).__init__()
         self.initUI(self)
 
 class initFuncSysMgt(QWidget, Ui_funcSystemMgt):
