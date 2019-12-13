@@ -39,7 +39,7 @@ class Ui_funcTradeAnalysis(object):
         db = sqlite3.connect('AMS.db')
         model = QStandardItemModel()
         query = """
-            SELECT Time,SymbolCode AS Symbol,OrderID,TradeID,OpenClose AS OC,BuySell AS BS,Price,Qty,Commission AS Comm
+            SELECT Time,SymbolCode AS Symbol,OrderID,TradeID,OpenClose AS OC,OrderType AS BS,Price,Qty,Commission AS Comm
             FROM Order_Table
             WHERE AccountID = 'IB' and Date = '"""
         query = query + self.Date.date().toString('yyyy-MM-dd') + "'"
@@ -197,7 +197,7 @@ class Ui_funcTradeAnalysis(object):
         dictData['OrderID'] = int(self.OrderID.currentText())
         dictData['TradeID'] = int(self.TradeID.currentText())
         listBuySell = self.BuySell.currentText().split('-')
-        dictData['BuySell'] = listBuySell[1]
+        dictData['OrderType'] = listBuySell[1]
         dictData['OpenClose'] =  listBuySell[0]
         dictData['CurTrade'] = self.Cur.currentText()
         dictData['CurSettle'] = self.Cur.currentText()

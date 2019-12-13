@@ -6,7 +6,7 @@ from formRptDailySummary import Ui_DailySummary
 from formRptTest import Ui_ReportTest
 from formFuncTradeAnalysis import Ui_funcTradeAnalysis
 from formFuncSystemMgt import Ui_funcSystemMgt
-from formSecond import Ui_Second
+from formFuncTradeEntry import Ui_funcTradeEntry
 
 class Ui_MainWindow(QMainWindow):
     def __init__(self, parent=None):
@@ -25,7 +25,7 @@ class Ui_MainWindow(QMainWindow):
         #初始化页面
         self.formReportSummary = initRptDailySummary()
         self.formReportHolding = initRptTest()
-        self.formFuncTradeEntry = initSecond()
+        self.formFuncTradeEntry = initFuncTradeEntry()
         self.formFuncSystemMgt = initFuncSysMgt()
         self.formFuncTradeAnalysis = initFuncTradeAnalysis()
 
@@ -132,9 +132,9 @@ class initFuncSysMgt(QWidget, Ui_funcSystemMgt):
         super(initFuncSysMgt,self).__init__()
         self.initUI(self)
 
-class initSecond(QWidget, Ui_Second):
+class initFuncTradeEntry(QWidget, Ui_funcTradeEntry):
     def __init__(self):
-        super(initSecond,self).__init__()
+        super(initFuncTradeEntry,self).__init__()
         self.initUI(self)
 
 if __name__ == '__main__':
