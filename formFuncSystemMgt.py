@@ -54,7 +54,7 @@ class Ui_funcSystemMgt(object):
         self.editSector = QComboBox()
 
         self.editUnderly.addItems(['','MHI','MCH'])
-        self.editAsset.addItems(['EQUITY','BOND','DERIVATIVES'])
+        self.editAsset.addItems(['EQUITY','BOND','DERIVATIVES','CASH'])
         self.editMarket.addItems(['CHINA','HONG KONG'])
         self.editCur.addItems(['CNY','HKD','USD'])
 
