@@ -11,7 +11,7 @@ import getData
 class Ui_funcTradeEntry(object):
     def initUI(self, Ui_funcTradeEntry):
 
-        self.acctList = ('CITIC','CMB','HUATAI','FUTU')
+        self.acctList = ('CITIC','CMS','HUATAI','FUTU')
 
         mainLayout = QVBoxLayout()
         self.setLayout(mainLayout)
@@ -44,6 +44,7 @@ class Ui_funcTradeEntry(object):
         df = pd.read_sql(query, con = db)
         df.sort_values(by=['Date'], ascending=False, inplace=True)
         getData.load_table(self.tableTrade, model, df)
+        self.tableTrade.sortByColumn(1,1)
 
     def initEdit(self):
         layout = QVBoxLayout()
@@ -52,7 +53,6 @@ class Ui_funcTradeEntry(object):
         labelAcct = QLabel("Account ID")
         labelDate = QLabel("Trade Date")
         labelSymbolCode = QLabel("Symbol Code")
-        labelSymbolName = QLabel("Symbol Name")
         labelOrderType = QLabel("Order Type")
         labelPrice = QLabel("Price")
         labelCur = QLabel("Currency")
@@ -64,7 +64,6 @@ class Ui_funcTradeEntry(object):
         self.Acct = QComboBox()
         self.Date = QDateEdit(QDate.currentDate())
         self.SymbolCode = QComboBox()
-        self.SymbolName = QLineEdit('')
         self.OrderType = QComboBox()
         self.Price = QLineEdit('0')
         self.Cur = QComboBox()
@@ -78,18 +77,20 @@ class Ui_funcTradeEntry(object):
         self.Date.setMaximumDate(QDate.currentDate())
         codeList = getData.get_list('Symbol_Table','SymbolCode')
         codeList.insert(0,'')
-        codeList = [str(i) for i in codeList]
-        self.SymbolCode.addItems(codeList)
+        listSymbol = []
+        i = 0
+        for code in codeList:
+            codeSymbol = MySymbol(code)
+            listSymbol.insert(i, codeSymbol.Code.ljust(10,' ') + ' | ' + codeSymbol.Name)
+            i = i + 1
+        self.SymbolCode.addItems(listSymbol)
         self.Cur.addItems(['HKD','CNY','USD'])
         self.OrderType.addItems(['Buy','Sell','Deposit','Withdraw','Bonus','Interest'])
-
-        self.SymbolName.setReadOnly(True)
 
         self.Acct.setStyleSheet("background-color:white")
         self.SymbolCode.setStyleSheet("background-color:white")
         self.OrderType.setStyleSheet("background-color:white")
         self.Cur.setStyleSheet("background-color:white")
-        #self.SymbolName.setStyleSheet("background-color:rgb(225,225,225)")
 
         self.SymbolCode.currentIndexChanged.connect(self.codeChanged)
         self.OrderType.currentIndexChanged.connect(self.amtCal)
@@ -114,12 +115,14 @@ class Ui_funcTradeEntry(object):
         gridEdit.addWidget(labelTradeAmt,0,8)
         gridEdit.addWidget(self.TradeAmt,0,9)
 
-        gridEdit.addWidget(labelSymbolName,1,2)
-        gridEdit.addWidget(self.SymbolName,1,3)
-        gridEdit.addWidget(labelCur,1,4)
-        gridEdit.addWidget(self.Cur,1,5)
-        gridEdit.addWidget(labelQty,1,6)
-        gridEdit.addWidget(self.Qty,1,7)
+        gridEdit.addWidget(labelDate,1,0)
+        gridEdit.addWidget(self.Date,1,1)
+        gridEdit.addWidget(labelCur,1,2)
+        gridEdit.addWidget(self.Cur,1,3)
+        gridEdit.addWidget(labelQty,1,4)
+        gridEdit.addWidget(self.Qty,1,5)
+        gridEdit.addWidget(labelCommission,1,6)
+        gridEdit.addWidget(self.Commission,1,7)
         gridEdit.addWidget(labelSettleAmt,1,8)
         gridEdit.addWidget(self.SettleAmt,1,9)
 
@@ -147,7 +150,7 @@ class Ui_funcTradeEntry(object):
         labelStartDate = QLabel("Start Date")
         labelEndDate = QLabel("End Date")
         labelAccount = QLabel("Account ID")
-        self.StartDate = QDateEdit(QDate(2019,1,1))
+        self.StartDate = QDateEdit(QDate(2018,1,1))
         self.EndDate = QDateEdit(QDate.currentDate())
         self.AccountID = QComboBox()
 
@@ -184,11 +187,11 @@ class Ui_funcTradeEntry(object):
         dictData['AccountID'] = self.Acct.currentText()
         dictData['Date'] = self.Date.date().toString('yyyy-MM-dd')
         dictData['Time']= '00:00:00'
-        dictData['SymbolCode'] = self.SymbolCode.currentText()
-        dictData['SymbolName'] = self.SymbolName.text()
+        dictData['SymbolCode'] = self.SymbolCode.currentText().split('|')[0].strip()
+        dictData['SymbolName'] = self.SymbolCode.currentText().split('|')[1].strip()
         dictData['OrderID'] = 0
         dictData['TradeID'] = 0
-        dictData['OrderType'] = self.BuySell.currentText()
+        dictData['OrderType'] = self.OrderType.currentText()
         dictData['OpenClose'] =  ''
         dictData['CurTrade'] = self.Cur.currentText()
         dictData['CurSettle'] = self.Cur.currentText()
@@ -202,8 +205,7 @@ class Ui_funcTradeEntry(object):
         self.fill_data()
 
     def codeChanged(self):
-        self.Symbol = MySymbol(self.SymbolCode.currentText())
-        self.SymbolName.setText(str(self.Symbol.Name))
+        self.Symbol = MySymbol(self.SymbolCode.currentText().split('|')[0].strip())
         self.Cur.setCurrentText(self.Symbol.curSettle)
 
     def amtCal(self):
@@ -211,13 +213,21 @@ class Ui_funcTradeEntry(object):
         qty = 0 if self.Qty.text().strip()=='' else float(self.Qty.text().strip())
         comm = 0 if self.Commission.text().strip()=='' else float(self.Commission.text().strip())
         
-        amtTrade = price * qty * self.Symbol.Multiplier
+        amtTrade = price * qty
 
         strOrderType = self.OrderType.currentText()
         if strOrderType == 'Buy':
-            amtSettle = -1 * (amtTrade + qty * comm)
+            amtSettle = -1 * (amtTrade + comm)
         elif strOrderType == 'Sell':
-            amtSettle = amtTrade - qty * comm
+            amtSettle = amtTrade - comm
+        elif  strOrderType == 'Deposit':
+            amtSettle = amtTrade
+        elif strOrderType == 'Withdraw':
+            amtSettle = amtTrade * -1
+        elif strOrderType == 'Interest':
+            amtSettle = amtTrade
+        elif  strOrderType == 'Bonus':
+            amtSettle = amtTrade
         else:
             amtSettle = 0
 
@@ -228,9 +238,9 @@ class Ui_funcTradeEntry(object):
         pass           
 
 class MySymbol:
-    def __init__(self, symbolCode):
+    def __init__(self, symbolcode):
         db = sqlite3.connect('AMS.db')
-        query = "select * from Symbol_Table where SymbolCode='{}'".format(symbolCode)
+        query = "select * from Symbol_Table where SymbolCode='{}'".format(symbolcode)
         df = pd.read_sql(query, con = db)
 
         if not df.empty:
