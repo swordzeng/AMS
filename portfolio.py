@@ -13,6 +13,11 @@ def get_trans(dt, account):
 
 
 def get_holding(date, df_trans):
+    db = sqlite3.connect('AMS.db')
+    query = "SELECT SymbolCode, AssetClass FROM Symbol_Table"
+    df_symbol = pd.read_sql(query, con=db)
+    df_trans = pd.merge(df_trans, df_symbol, on='SymbolCode', how='left')
+
     #取股票持仓
     df_trans_stock = df_trans[~df_trans['Symbol_Code'].isin(tuple_cur)]
     df_group_stock = df_trans_stock.loc[:, ['Symbol_Code', 'Symbol_Name', 'Cur', 'Quantity']]
