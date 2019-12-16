@@ -233,19 +233,19 @@ class Ui_funcTradeAnalysis(object):
         self.SettleAmt.setText(str(amtSettle)) 
 
     def addActionColumn(self, tableView, model, tableName):
-            columnPos = model.columnCount() - 1
-            tableView.setColumnHidden(columnPos, False)
+        columnPos = model.columnCount() - 1
+        tableView.setColumnHidden(columnPos, False)
 
-            rowCount = model.rowCount()
-            for row in range(rowCount):
-                iconDelete = QIcon()
-                iconDelete.addFile('logo/delete1.png')
-                btnDelete = QPushButton('')
-                btnDelete.setIcon(iconDelete)
-                btnDelete.clicked.connect(lambda:self.deleteSymbol(tableName))
-                transID = model.itemData(model.index(row,0))[0]  #返回dict类型
-                btnDelete.setProperty("ID", transID)    
-                tableView.setIndexWidget(model.index(row,columnPos), btnDelete) 
+        rowCount = model.rowCount()
+        for row in range(rowCount):
+            iconDelete = QIcon()
+            iconDelete.addFile('logo/delete1.png')
+            btnDelete = QPushButton('')
+            btnDelete.setIcon(iconDelete)
+            btnDelete.clicked.connect(lambda:self.deleteSymbol(tableName))
+            transID = model.itemData(model.index(row,0))[0]  #返回dict类型
+            btnDelete.setProperty("ID", transID)    
+            tableView.setIndexWidget(model.index(row,columnPos), btnDelete) 
 
     def deleteSymbol(self,table):
         btn = self.sender()

@@ -5,8 +5,8 @@ from DataFrameModel import PandasModel
 import pandas as pd
  
 
-class Ui_ReportTest(object):
-    def initUI(self, Ui_ReportTest):
+class Ui_ReportHolding(object):
+    def initUI(self, Ui_ReportHolding):
 
         #初始化报告参数
         self.rptDate = ''

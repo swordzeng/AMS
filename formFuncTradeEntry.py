@@ -38,13 +38,15 @@ class Ui_funcTradeEntry(object):
         db = sqlite3.connect('AMS.db')
         model = QStandardItemModel()
         query = """
-            SELECT AccountID,Date,SymbolCode,SymbolName,OrderType,Price,CurSettle AS Cur,Qty,Commission AS Comm,TradeAmt,SettleAmt
+            SELECT ID,AccountID,Date,SymbolCode,SymbolName,OrderType,Price,CurSettle AS Cur,Qty,Commission AS Comm,TradeAmt,SettleAmt
             FROM Order_Table
             WHERE AccountID in {} and Date >= '{}' and Date <= '{}' """.format(strAcct,dateStart,dateEnd)
         df = pd.read_sql(query, con = db)
         df.sort_values(by=['Date'], ascending=False, inplace=True)
         getData.load_table(self.tableTrade, model, df)
+        self.addActionColumn(self.tableTrade, model, 'Order_Table')
         self.tableTrade.sortByColumn(1,1)
+        self.tableTrade.hideColumn(0)
 
     def initEdit(self):
         layout = QVBoxLayout()
@@ -235,7 +237,32 @@ class Ui_funcTradeEntry(object):
         self.SettleAmt.setText(str(amtSettle)) 
 
     def addActionColumn(self, tableView, model, tableName):
-        pass           
+        columnPos = model.columnCount() - 1
+        tableView.setColumnHidden(columnPos, False)
+
+        rowCount = model.rowCount()
+        for row in range(rowCount):
+            iconDelete = QIcon()
+            iconDelete.addFile('logo/delete1.png')
+            btnDelete = QPushButton('')
+            btnDelete.setIcon(iconDelete)
+            btnDelete.clicked.connect(lambda:self.deleteSymbol(tableName))
+            transID = model.itemData(model.index(row,0))[0]  #返回dict类型
+            btnDelete.setProperty("ID", transID)    
+            tableView.setIndexWidget(model.index(row,columnPos), btnDelete) 
+
+    def deleteSymbol(self,table):
+        btn = self.sender()
+        db = sqlite3.connect('AMS.db')
+        query = "DELETE FROM " + table + " WHERE ID = " + str(btn.property('ID'))
+        print(query)
+        cursor = db.cursor()
+        cursor.execute(query)
+        db.commit()
+        cursor.close()
+
+        self.fill_data()
+
 
 class MySymbol:
     def __init__(self, symbolcode):

@@ -3,7 +3,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from formRptDailySummary import Ui_DailySummary
-from formRptTest import Ui_ReportTest
+from formRptHolding import Ui_ReportHolding
 from formFuncTradeAnalysis import Ui_funcTradeAnalysis
 from formFuncSystemMgt import Ui_funcSystemMgt
 from formFuncTradeEntry import Ui_funcTradeEntry
@@ -24,7 +24,7 @@ class Ui_MainWindow(QMainWindow):
 
         #初始化页面
         self.formReportSummary = initRptDailySummary()
-        self.formReportHolding = initRptTest()
+        self.formReportHolding = initRptHolding()
         self.formFuncTradeEntry = initFuncTradeEntry()
         self.formFuncSystemMgt = initFuncSysMgt()
         self.formFuncTradeAnalysis = initFuncTradeAnalysis()
@@ -117,9 +117,9 @@ class initRptDailySummary(QWidget, Ui_DailySummary):
         #子窗口初始化时实现子窗口布局
         self.initUI(self)
 
-class initRptTest(QWidget, Ui_ReportTest):
+class initRptHolding(QWidget, Ui_ReportHolding):
     def __init__(self):
-        super(initRptTest,self).__init__()
+        super(initRptHolding,self).__init__()
         self.initUI(self)
   
 class initFuncTradeAnalysis(QWidget, Ui_funcTradeAnalysis):
