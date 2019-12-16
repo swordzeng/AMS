@@ -39,13 +39,14 @@ class Ui_funcTradeAnalysis(object):
         db = sqlite3.connect('AMS.db')
         model = QStandardItemModel()
         query = """
-            SELECT Time,SymbolCode AS Symbol,OrderID,TradeID,OpenClose AS OC,OrderType AS BS,Price,Qty,Commission AS Comm
+            SELECT ID,Time,OrderID,TradeID,OpenClose AS OC,OrderType AS BS,Price,Qty,Commission AS Comm
             FROM Order_Table
             WHERE AccountID = 'IB' and Date = '"""
         query = query + self.Date.date().toString('yyyy-MM-dd') + "'"
         df = pd.read_sql(query, con = db)
         getData.load_table(self.tableTrade, model, df)
-        #self.addActionColumn(self.tableView, model, strTable)
+        self.addActionColumn(self.tableTrade, model, 'Order_Table')
+        self.tableTrade.hideColumn(0)
 
         query = "SELECT * FROM Order_Table"
         dfAll = pd.read_sql(query, con=db)
@@ -244,7 +245,19 @@ class Ui_funcTradeAnalysis(object):
                 btnDelete.clicked.connect(lambda:self.deleteSymbol(tableName))
                 transID = model.itemData(model.index(row,0))[0]  #返回dict类型
                 btnDelete.setProperty("ID", transID)    
-                tableView.setIndexWidget(model.index(row,columnPos), btnDelete)           
+                tableView.setIndexWidget(model.index(row,columnPos), btnDelete) 
+
+    def deleteSymbol(self,table):
+        btn = self.sender()
+        db = sqlite3.connect('AMS.db')
+        query = "DELETE FROM " + table + " WHERE ID = " + str(btn.property('ID'))
+        print(query)
+        cursor = db.cursor()
+        cursor.execute(query)
+        db.commit()
+        cursor.close()
+
+        self.fill_data()
 
 class MySymbol:
     def __init__(self, symbolCode):

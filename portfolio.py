@@ -19,7 +19,7 @@ def get_holding(date, df_trans):
     df_trans = pd.merge(df_trans, df_symbol, on='SymbolCode', how='left')
 
     #取股票持仓
-    df_trans_stock = df_trans[~df_trans['Symbol_Code'].isin(tuple_cur)]
+    df_trans_stock = df_trans[~df_trans['AssetClass'].isin(['CASH'])]
     df_group_stock = df_trans_stock.loc[:, ['Symbol_Code', 'Symbol_Name', 'Cur', 'Quantity']]
     df_group_stock = df_group_stock.groupby(['Symbol_Code', 'Symbol_Name', 'Cur']).sum()
     df_group_stock = df_group_stock.reset_index()
