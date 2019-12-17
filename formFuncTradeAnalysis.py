@@ -48,7 +48,7 @@ class Ui_funcTradeAnalysis(object):
         self.addActionColumn(self.tableTrade, model, 'Order_Table')
         self.tableTrade.hideColumn(0)
 
-        query = "SELECT * FROM Order_Table"
+        query = "SELECT * FROM Order_Table WHERE AccountID = 'IB' "
         dfAll = pd.read_sql(query, con=db)
         dfAll['DateTime'] = pd.to_datetime(dfAll['Date'])
         dfAll['Year'] = dfAll['DateTime'].dt.year

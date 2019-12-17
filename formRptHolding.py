@@ -1,97 +1,52 @@
 # -*- coding: utf-8 -*-
- 
-from PyQt5 import QtCore, QtGui, QtWidgets
-from DataFrameModel import PandasModel
+
+import sys 
+import sqlite3
 import pandas as pd
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+import portfolio
+import getData
  
 
 class Ui_ReportHolding(object):
     def initUI(self, Ui_ReportHolding):
 
-        #初始化报告参数
-        self.rptDate = ''
-        self.rptAcct = ''
+        self.acctList = ('CITIC','CMS','HUATAI','FUTU')
 
-        #初始化页面布局组件
-        mainLayout = QtWidgets.QVBoxLayout(self)
-        paraLayout = QtWidgets.QHBoxLayout()
-        rptLayout = QtWidgets.QHBoxLayout()
+        self.Date = QDateEdit(QDate.currentDate())
+        self.Date.setCalendarPopup(True)
+        self.Date.setMaximumDate(QDate.currentDate())
+        self.Acct = QComboBox()
+        self.Acct.addItems(self.acctList)
 
-        ########################################################
-        #设置参数内容与格局
-        #添加日期参数
-        labelDate = QtWidgets.QLabel('REPORT TEST')
-        cal = QtWidgets.QCalendarWidget()
-        dtEdit = QtWidgets.QDateEdit(QtCore.QDate.currentDate())
-        dtEdit.setCalendarPopup(True)
-        dtEdit.setCalendarWidget(cal)
-        dtEdit.setMaximumDate(QtCore.QDate.currentDate())
-        dtEdit.setDate(cal.selectedDate())
+        labelDate = QLabel('Report Date')
+        labelAcct = QLabel('Account')
 
-        #添加账号参数
-        labelAcct = QtWidgets.QLabel('Account')
-        comboAcct = QtWidgets.QComboBox()
-        comboAcct.setEditable(True)
-        comboAcct.lineEdit().setAlignment(QtCore.Qt.AlignLeft)
-
-        #提取报告按钮
-        btnReport = QtWidgets.QPushButton("RUN REPORT")
-
-        #设置参数布局内容
-        paraLayout.addWidget(labelDate)
-        paraLayout.addWidget(dtEdit)
-        paraLayout.addWidget(labelAcct)
-        paraLayout.addWidget(comboAcct)
-        paraLayout.addStretch(10)
-        paraLayout.addWidget(btnReport)
-        paraLayout.addStretch(1)
-
-        ########################################################
-        #报告内容
-        self.tblHold = QtWidgets.QTableView()
-        rptLayout.addWidget(self.tblHold)
-
-        ########################################################
-        #设置页面主格局
-        paraWidgets = QtWidgets.QWidget()
-        paraWidgets.setLayout(paraLayout)
-        mainLayout.addWidget(paraWidgets)
-        #mainLayout.addLayout(paraLayout)
-        mainLayout.addLayout(rptLayout)
-
-        #设置默认参数
-        comboAcct.addItems(['Citic', 'CMB', 'ALL'])
-
-        #设置参数操作事件
-        dtEdit.dateChanged.connect(self.saveDate)
-        comboAcct.currentTextChanged.connect(self.saveAcct)
+        btnReport = QPushButton("RUN REPORT")
         btnReport.clicked.connect(self.loadReport)
 
-        #页面视觉调整
-        #comboAcct.setStyleSheet("background-color:white;")
-        paraWidgets.setStyleSheet('''
-            QDateEdit{background-color:white}
-            QComboBox{background-color:white}
-            QPushButton{background-color:white;font:bold}
-            ''')
-        paraLayout.setContentsMargins(0, 5, 0, 5)
-        rptLayout.setContentsMargins(0, 0, 0, 0)
-        mainLayout.setContentsMargins(0, 0, 0, 0)
-        mainLayout.setSpacing(0)
+        self.tableHold = QTableView()
 
-        #提取默认参数值
-        self.rptDate = dtEdit.date().toString('yyyyMMdd')
-        self.rptAcct = comboAcct.currentText()
+        hLayout = QHBoxLayout()
+        hLayout.addWidget(labelDate)
+        hLayout.addWidget(self.Date)
+        hLayout.addWidget(labelAcct)
+        hLayout.addWidget(self.Acct)
+        hLayout.addStretch()
+        hLayout.addWidget(btnReport)
+
+        mainLayout = QVBoxLayout()
+        mainLayout.addLayout(hLayout)
+        mainLayout.addWidget(self.tableHold)
+        self.setLayout(mainLayout)
+
 
     def loadReport(self):
-        df = pd.read_excel('A_Shares.xlsx',sheet_name='Trans')
-        model = PandasModel(df)
-        self.tblHold.setModel(model)
-        self.tblHold.setSortingEnabled(True)
-        self.tblHold.horizontalHeader().setStyleSheet("QHeaderView::section {background-color:lightblue;color: black;padding-left: 4px;border: 1px solid #6c6c6c;font: bold;}")
+        db = sqlite3.connect('AMS.db')
+        model = QStandardItemModel()
 
-    def saveAcct(self, str):
-        self.rptAcct = str
+        dfHold = portfolio.get_hold(self.Date.date().toString('yyyy-MM-dd'), self.acctList)
+        getData.load_table(self.tableHold, model, dfHold)
 
-    def saveDate(self, date):
-        self.rptDate = date.toString('yyyyMMdd')
