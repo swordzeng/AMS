@@ -50,7 +50,9 @@ def load_table(tableView, model, df):
                 itemValue = float(itemValue)
                 if itemValue < 0:
                     item.setForeground(QBrush(QColor(255, 0, 0)))
+                itemValue = '{:.2f}'.format(itemValue)
             item.setData(itemValue, Qt.DisplayRole)
+            #item.setEditable(False)
             model.setItem(row, column, item)
 
     tableView.setModel(model)

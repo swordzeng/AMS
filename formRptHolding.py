@@ -44,9 +44,9 @@ class Ui_ReportHolding(object):
 
 
     def loadReport(self):
-        db = sqlite3.connect('AMS.db')
-        model = QStandardItemModel()
 
         dfHold = portfolio.get_hold(self.Date.date().toString('yyyy-MM-dd'), self.acctList)
+
+        model = QStandardItemModel()
         getData.load_table(self.tableHold, model, dfHold)
 
