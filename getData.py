@@ -43,6 +43,7 @@ def load_table(tableView, model, df):
         for column in range(columnCount):
             item = QStandardItem()
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            
             itemValue = df.iloc[row,column]
             if type(itemValue).__name__ == 'int64':
                 itemValue = int(itemValue)
@@ -51,6 +52,17 @@ def load_table(tableView, model, df):
                 if itemValue < 0:
                     item.setForeground(QBrush(QColor(255, 0, 0)))
                 itemValue = '{:.2f}'.format(itemValue)
+            
+            '''
+            try:
+                itemValue = float(df.iloc[row,column])
+            except BaseException:
+                itemValue = df.iloc[row,column]
+            else:
+                itemValue = QVariant('%.2f'%df.iloc[row,column])
+                if itemValue < 0:
+                    item.setForeground(QBrush(QColor(255, 0, 0)))
+            '''
             item.setData(itemValue, Qt.DisplayRole)
             #item.setEditable(False)
             model.setItem(row, column, item)

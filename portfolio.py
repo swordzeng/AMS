@@ -44,6 +44,7 @@ def get_hold(dt, account):
     df_hold['Date'] = dt
 
     df_hold = get_realtime_price(df_hold)
+    df_hold = cal_factor(df_hold)
 
     return df_hold
 
@@ -75,14 +76,26 @@ def get_realtime_price(df):
             market = df.loc[index,'Market']
             code = market.lower() + df.loc[index,'SymbolCode'].split('.')[0]
             url = 'http://hq.sinajs.cn/?format=text&list={}'.format(code)
-            print(url)
             price_text = requests.get(url).text
             price_list = price_text.split(',')
-            print(price_text)
             if market =='HK':
                 price = price_list[5]
             else:
                 price = price_list[3]
-            df.loc[index, 'Price'] = price
+            df.loc[index, 'Price'] = float(price)
+
+    return df
+
+def cal_factor(df):
+    #计算指标
+    df['Cost'] = df.apply(lambda x: round(x['CostAmt']/x['Qty'],2),axis=1)
+    df['MV'] = df.apply(lambda x: round(float(x['Qty'])*float(x['Price']),2),axis=1)
+    df['PL'] = df.apply(lambda x: round(x['MV']-x['CostAmt'],2),axis=1)
+    #解决 -0 问题
+    df['PL'] = df.apply(lambda x: x['PL'] if x['PL'] != 0 else abs(x['PL']),axis=1)
+    
+    df['Ratio'] = round(df.apply(lambda x:((x['MV']-x['CostAmt'])/x['CostAmt']) if x['CostAmt']!=0 else 0, axis=1), 2)
+    #解决 -0 问题
+    df['Ratio'] = df.apply(lambda x: x['Ratio'] if x['Ratio'] != 0 else abs(x['Ratio']),axis=1)
 
     return df
