@@ -6,6 +6,7 @@ import pandas as pd
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+import DataFrameModel as dfm
 import getData
 
 class Ui_funcTradeEntry(object):
@@ -22,7 +23,7 @@ class Ui_funcTradeEntry(object):
         self.groupBox = QGroupBox('Trade Records')
         mainLayout.addWidget(self.groupBox)
 
-        self.Symbol = MySymbol('')
+        self.Symbol = getData.MySymbol('')
 
         self.initEdit()
         self.fill_data()
@@ -36,16 +37,19 @@ class Ui_funcTradeEntry(object):
             strAcct = "('" +  self.AccountID.currentText() + "')"
 
         db = sqlite3.connect('AMS.db')
-        model = QStandardItemModel()
         query = """
             SELECT ID,AccountID,Date,SymbolCode,SymbolName,OrderType,Price,CurSettle AS Cur,Qty,Commission AS Comm,TradeAmt,SettleAmt
             FROM Order_Table
             WHERE AccountID in {} and Date >= '{}' and Date <= '{}' """.format(strAcct,dateStart,dateEnd)
         df = pd.read_sql(query, con = db)
+        df['Action'] = ''
         df.sort_values(by=['Date'], ascending=False, inplace=True)
-        getData.load_table(self.tableTrade, model, df)
-        self.addActionColumn(self.tableTrade, model, 'Order_Table')
-        self.tableTrade.sortByColumn(1,1)
+
+        model = dfm.PandasModel(df)
+        self.tableTrade.setModel(model)
+        dfm.FormatView(self.tableTrade)
+        dfm.addActionColumn(self.tableTrade, model, 'Order_Table', self.deleteSymbol)
+        self.tableTrade.sortByColumn(0,Qt.DescendingOrder)
         self.tableTrade.hideColumn(0)
 
     def initEdit(self):
@@ -82,7 +86,7 @@ class Ui_funcTradeEntry(object):
         listSymbol = []
         i = 0
         for code in codeList:
-            codeSymbol = MySymbol(code)
+            codeSymbol = getData.MySymbol(code)
             listSymbol.insert(i, codeSymbol.Code.ljust(10,' ') + ' | ' + codeSymbol.Name)
             i = i + 1
         self.SymbolCode.addItems(listSymbol)
@@ -152,7 +156,7 @@ class Ui_funcTradeEntry(object):
         labelStartDate = QLabel("Start Date")
         labelEndDate = QLabel("End Date")
         labelAccount = QLabel("Account ID")
-        self.StartDate = QDateEdit(QDate(2018,1,1))
+        self.StartDate = QDateEdit(QDate(2018,12,31))
         self.EndDate = QDateEdit(QDate.currentDate())
         self.AccountID = QComboBox()
 
@@ -207,7 +211,7 @@ class Ui_funcTradeEntry(object):
         self.fill_data()
 
     def codeChanged(self):
-        self.Symbol = MySymbol(self.SymbolCode.currentText().split('|')[0].strip())
+        self.Symbol = getData.MySymbol(self.SymbolCode.currentText().split('|')[0].strip())
         self.Cur.setCurrentText(self.Symbol.curSettle)
 
     def amtCal(self):
@@ -236,25 +240,12 @@ class Ui_funcTradeEntry(object):
         self.TradeAmt.setText(str(amtTrade))
         self.SettleAmt.setText(str(amtSettle)) 
 
-    def addActionColumn(self, tableView, model, tableName):
-        columnPos = model.columnCount() - 1
-        tableView.setColumnHidden(columnPos, False)
-
-        rowCount = model.rowCount()
-        for row in range(rowCount):
-            iconDelete = QIcon()
-            iconDelete.addFile('logo/delete1.png')
-            btnDelete = QPushButton('')
-            btnDelete.setIcon(iconDelete)
-            btnDelete.clicked.connect(lambda:self.deleteSymbol(tableName))
-            transID = model.itemData(model.index(row,0))[0]  #返回dict类型
-            btnDelete.setProperty("ID", transID)    
-            tableView.setIndexWidget(model.index(row,columnPos), btnDelete) 
-
-    def deleteSymbol(self,table):
+    def deleteSymbol(self, model):
         btn = self.sender()
         db = sqlite3.connect('AMS.db')
-        query = "DELETE FROM " + table + " WHERE ID = " + str(btn.property('ID'))
+        transID = model.data(model.index(btn.property('row'),0)).value()
+        print(transID)
+        query = "DELETE FROM Order_Table WHERE ID = " + str(transID)
         print(query)
         cursor = db.cursor()
         cursor.execute(query)
@@ -264,32 +255,5 @@ class Ui_funcTradeEntry(object):
         self.fill_data()
 
 
-class MySymbol:
-    def __init__(self, symbolcode):
-        db = sqlite3.connect('AMS.db')
-        query = "select * from Symbol_Table where SymbolCode='{}'".format(symbolcode)
-        df = pd.read_sql(query, con = db)
-
-        if not df.empty:
-            self.Code = df.iloc[0]['SymbolCode']
-            self.Name = df.iloc[0]['SymbolName']
-            self.Market = df.iloc[0]['Market']
-            self.Underly = df.iloc[0]['Underlying']
-            self.AssetClass = df.iloc[0]['AssetClass']
-            self.CurTrade = df.iloc[0]['CurTrade']
-            self.curSettle = df.iloc[0]['CurSettle']
-            self.Multiplier = df.iloc[0]['Multiplier']
-            self.Commission = df.iloc[0]['Commission']
-            self.Sector = df.iloc[0]['Sector']
-        else:
-            self.Code = ''
-            self.Name = ''
-            self.Market = ''
-            self.Underly = ''
-            self.AssetClass = ''
-            self.CurTrade = ''
-            self.curSettle = ''
-            self.Multiplier = ''
-            self.Commission = 0  
-            self.Sector = ''          
+     
 

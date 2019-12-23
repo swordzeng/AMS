@@ -78,4 +78,32 @@ def load_table(tableView, model, df):
     tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
     tableView.resizeColumnsToContents()
     tableView.horizontalHeader().setStyleSheet("QHeaderView::section {background-color:lightblue;color: black;padding-left: 4px;border: 1px solid #6c6c6c;font: bold;}")
-    
+
+class MySymbol:
+    def __init__(self, symbolcode):
+        db = sqlite3.connect('AMS.db')
+        query = "select * from Symbol_Table where SymbolCode='{}'".format(symbolcode)
+        df = pd.read_sql(query, con = db)
+
+        if not df.empty:
+            self.Code = df.iloc[0]['SymbolCode']
+            self.Name = df.iloc[0]['SymbolName']
+            self.Market = df.iloc[0]['Market']
+            self.Underly = df.iloc[0]['Underlying']
+            self.AssetClass = df.iloc[0]['AssetClass']
+            self.CurTrade = df.iloc[0]['CurTrade']
+            self.curSettle = df.iloc[0]['CurSettle']
+            self.Multiplier = df.iloc[0]['Multiplier']
+            self.Commission = df.iloc[0]['Commission']
+            self.Sector = df.iloc[0]['Sector']
+        else:
+            self.Code = ''
+            self.Name = ''
+            self.Market = ''
+            self.Underly = ''
+            self.AssetClass = ''
+            self.CurTrade = ''
+            self.curSettle = ''
+            self.Multiplier = ''
+            self.Commission = 0  
+            self.Sector = ''     

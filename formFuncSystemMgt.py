@@ -55,7 +55,7 @@ class Ui_funcSystemMgt(object):
 
         self.editUnderly.addItems(['','MHI','MCH'])
         self.editAsset.addItems(['EQUITY','BOND','DERIVATIVES','CASH'])
-        self.editMarket.addItems(['','CHINA','HONG KONG'])
+        self.editMarket.addItems(['','SH','SZ','HK'])
         self.editCur.addItems(['CNY','HKD','USD'])
 
         self.editSector.setEditable(True)

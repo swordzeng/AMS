@@ -7,6 +7,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import getData
+import DataFrameModel as dfm
 
 class Ui_funcTradeAnalysis(object):
     def initUI(self, Ui_funcTradeAnalysis):
@@ -30,23 +31,26 @@ class Ui_funcTradeAnalysis(object):
         hLayout.addLayout(vLayout,2)
         mainLayout.addLayout(hLayout)
 
-        self.Symbol = MySymbol('')
+        self.Symbol = getData.MySymbol('')
 
         self.initEdit()
         self.fill_data()
 
     def fill_data(self):
         db = sqlite3.connect('AMS.db')
-        model = QStandardItemModel()
         query = """
             SELECT ID,Time,OrderID,TradeID,OpenClose AS OC,OrderType AS BS,Price,Qty,Commission AS Comm
             FROM Order_Table
             WHERE AccountID = 'IB' and Date = '"""
         query = query + self.Date.date().toString('yyyy-MM-dd') + "'"
         df = pd.read_sql(query, con = db)
-        getData.load_table(self.tableTrade, model, df)
-        self.addActionColumn(self.tableTrade, model, 'Order_Table')
+        df['Action'] = ''
+        model = dfm.PandasModel(df)
+        self.tableTrade.setModel(model)
+        dfm.FormatView(self.tableTrade)
+        dfm.addActionColumn(self.tableTrade, model, 'XXX', self.deleteSymbol)
         self.tableTrade.hideColumn(0)
+        self.tableTrade.sortByColumn(0,0)
 
         query = "SELECT * FROM Order_Table WHERE AccountID = 'IB' "
         dfAll = pd.read_sql(query, con=db)
@@ -59,21 +63,24 @@ class Ui_funcTradeAnalysis(object):
         dfDayPL = dfMonth.groupby(['Date'])[['SettleAmt']].sum()
         dfMonthPL = dfAll.groupby(['Year','Month'])[['SettleAmt']].sum()
 
-        modelOrderPL = QStandardItemModel()
-        modelDayPL = QStandardItemModel()
-        modelMonthPL  = QStandardItemModel()
-
         dfOrderPL.reset_index(inplace =True)
         dfOrderPL.sort_values(by=['Date', 'OrderID'], ascending=False, inplace=True)
         dfDayPL.reset_index(inplace =True)
         dfDayPL.sort_values(by='Date', ascending=False, inplace=True)
         dfMonthPL.reset_index(inplace =True)
         dfMonthPL.sort_values(by=['Year', 'Month'], ascending=False, inplace=True)
-        getData.load_table(self.tableOrderPL, modelOrderPL, dfOrderPL)
-        getData.load_table(self.tableDayPL, modelDayPL, dfDayPL)
-        getData.load_table(self.tableMonthPL, modelMonthPL, dfMonthPL)
 
-        self.tableTrade.sortByColumn(0,0)
+        modelOrderPL = dfm.PandasModel(dfOrderPL)
+        self.tableOrderPL.setModel(modelOrderPL)
+        dfm.FormatView(self.tableOrderPL)
+
+        modelDayPL = dfm.PandasModel(dfDayPL)
+        self.tableDayPL.setModel(modelDayPL)
+        dfm.FormatView(self.tableDayPL)
+
+        modelMonthPL = dfm.PandasModel(dfMonthPL)
+        self.tableMonthPL.setModel(modelMonthPL)
+        dfm.FormatView(self.tableMonthPL)
 
     def initEdit(self):
         layout = QVBoxLayout()
@@ -212,7 +219,7 @@ class Ui_funcTradeAnalysis(object):
         self.fill_data()
 
     def codeChanged(self):
-        self.Symbol = MySymbol(self.SymbolCode.currentText())
+        self.Symbol = getData.MySymbol(self.SymbolCode.currentText())
         self.Commission.setText(str(self.Symbol.Commission))
         self.Cur.setCurrentText(self.Symbol.curSettle)
 
@@ -232,21 +239,6 @@ class Ui_funcTradeAnalysis(object):
         self.TradeAmt.setText(str(amtTrade))
         self.SettleAmt.setText(str(amtSettle)) 
 
-    def addActionColumn(self, tableView, model, tableName):
-        columnPos = model.columnCount() - 1
-        tableView.setColumnHidden(columnPos, False)
-
-        rowCount = model.rowCount()
-        for row in range(rowCount):
-            iconDelete = QIcon()
-            iconDelete.addFile('logo/delete1.png')
-            btnDelete = QPushButton('')
-            btnDelete.setIcon(iconDelete)
-            btnDelete.clicked.connect(lambda:self.deleteSymbol(tableName))
-            transID = model.itemData(model.index(row,0))[0]  #返回dict类型
-            btnDelete.setProperty("ID", transID)    
-            tableView.setIndexWidget(model.index(row,columnPos), btnDelete) 
-
     def deleteSymbol(self,table):
         btn = self.sender()
         db = sqlite3.connect('AMS.db')
@@ -259,30 +251,4 @@ class Ui_funcTradeAnalysis(object):
 
         self.fill_data()
 
-class MySymbol:
-    def __init__(self, symbolCode):
-        db = sqlite3.connect('AMS.db')
-        query = "select * from Symbol_Table where SymbolCode='{}'".format(symbolCode)
-        df = pd.read_sql(query, con = db)
-
-        if not df.empty:
-            self.Code = df.iloc[0]['SymbolCode']
-            self.Name = df.iloc[0]['SymbolName']
-            self.Market = df.iloc[0]['Market']
-            self.Underly = df.iloc[0]['Underlying']
-            self.AssetClass = df.iloc[0]['AssetClass']
-            self.CurTrade = df.iloc[0]['CurTrade']
-            self.curSettle = df.iloc[0]['CurSettle']
-            self.Multiplier = df.iloc[0]['Multiplier']
-            self.Commission = df.iloc[0]['Commission']
-        else:
-            self.Code = ''
-            self.Name = ''
-            self.Market = ''
-            self.Underly = ''
-            self.AssetClass = ''
-            self.CurTrade = ''
-            self.curSettle = ''
-            self.Multiplier = ''
-            self.Commission = 0            
 

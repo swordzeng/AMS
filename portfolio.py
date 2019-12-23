@@ -5,13 +5,19 @@ import pandas as pd
 def get_hold(dt, account):
     db = sqlite3.connect('AMS.db')
 
-    query = "SELECT SymbolCode, SymbolName, Market, AssetClass,Sector FROM Symbol_Table"
+    query = "SELECT SymbolCode, SymbolName, Market, AssetClass,Sector,CurSettle AS Cur FROM Symbol_Table"
     df_symbol = pd.read_sql(query, con=db)
+
+    if account.find(',') >=0:
+        acctCondition = " in {} ".format(account)
+    else:
+        acctCondition = " = '{}' ".format(account)
 
     query = """
             SELECT *
             FROM Order_Table
-            WHERE AccountID in {} and Date <= '{}' """.format(str(account),dt)
+            WHERE AccountID {} and Date <= '{}' """.format(acctCondition,dt)
+
     df_trans = pd.read_sql(query, con = db)
     df_trans = pd.merge(df_trans, df_symbol, on='SymbolCode', how='left')
 
@@ -46,6 +52,7 @@ def get_hold(dt, account):
     df_hold = get_realtime_price(df_hold)
     df_hold = cal_factor(df_hold)
 
+    df_hold = df_hold[['SymbolCode','SymbolName','Cur','Qty','CostPrice','Price','MV','PL','Ratio']]
     return df_hold
 
 def get_cost(code, qt, df):
@@ -88,14 +95,15 @@ def get_realtime_price(df):
 
 def cal_factor(df):
     #计算指标
-    df['Cost'] = df.apply(lambda x: round(x['CostAmt']/x['Qty'],2),axis=1)
+    df['CostPrice'] = df.apply(lambda x: round(x['CostAmt']/x['Qty'],3),axis=1)
     df['MV'] = df.apply(lambda x: round(float(x['Qty'])*float(x['Price']),2),axis=1)
     df['PL'] = df.apply(lambda x: round(x['MV']-x['CostAmt'],2),axis=1)
     #解决 -0 问题
     df['PL'] = df.apply(lambda x: x['PL'] if x['PL'] != 0 else abs(x['PL']),axis=1)
     
-    df['Ratio'] = round(df.apply(lambda x:((x['MV']-x['CostAmt'])/x['CostAmt']) if x['CostAmt']!=0 else 0, axis=1), 2)
+    df['Ratio'] = round(df.apply(lambda x:((x['MV']-x['CostAmt'])/x['CostAmt']) if x['CostAmt']!=0 else 0, axis=1), 4)
     #解决 -0 问题
     df['Ratio'] = df.apply(lambda x: x['Ratio'] if x['Ratio'] != 0 else abs(x['Ratio']),axis=1)
 
     return df
+

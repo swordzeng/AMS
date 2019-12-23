@@ -1,5 +1,4 @@
 from PyQt5 import QtCore, QtWidgets, QtGui
-
 import pandas as pd
 
 class PandasModel(QtCore.QAbstractTableModel): 
@@ -38,9 +37,9 @@ class PandasModel(QtCore.QAbstractTableModel):
                 try:
                     value = float(self._df.iloc[index.row(), index.column()])
                 except BaseException:
-                    return QtCore.QVariant(QtCore.Qt.AlignLeft) 
+                    return QtCore.QVariant(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter) 
                 else:
-                    return QtCore.QVariant(QtCore.Qt.AlignRight) 
+                    return QtCore.QVariant(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter) 
 
             return QtCore.QVariant()
 
@@ -55,6 +54,10 @@ class PandasModel(QtCore.QAbstractTableModel):
             else:
                 if list(self._df.columns)[index.column()].upper().find('RATIO') >= 0:
                     return QtCore.QVariant(format(self._df.iloc[index.row(), index.column()],'.2%'))
+                elif list(self._df.columns)[index.column()].find('ID') >= 0:
+                    return QtCore.QVariant('%.0f'%self._df.iloc[index.row(), index.column()])
+                elif list(self._df.columns)[index.column()].find('Price') >= 0:
+                    return QtCore.QVariant('%.3f'%self._df.iloc[index.row(), index.column()])
                 else:
                     return QtCore.QVariant('%.2f'%self._df.iloc[index.row(), index.column()]) 
 
@@ -87,15 +90,27 @@ class PandasModel(QtCore.QAbstractTableModel):
         self._df.reset_index(inplace=True, drop=True)
         self.layoutChanged.emit()
 
-class FloatDelegate(QtWidgets.QItemDelegate):
-    def __init__(self, decimals, parent=None):
-        QtWidgets.QItemDelegate.__init__(self, parent=parent)
-        self.nDecimals = decimals
 
-    def paint(self, painter, option, index):
-        value = index.model().data(index, QtCore.Qt.EditRole)
-        try:
-            number = float(value)
-            painter.drawText(option.rect, QtCore.Qt.AlignLeft, "{:.{}f}".format(number, self.nDecimals))
-        except :
-            QtWidgets.QItemDelegate.paint(self, painter, option, index)
+def FormatView(view):
+    view.setSortingEnabled(True)
+    view.verticalHeader().setHidden(True)
+    #水平方向，表格大小拓展到适当的尺寸      
+    view.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+    view.resizeColumnsToContents()
+    view.setAlternatingRowColors(True)
+    view.horizontalHeader().setStyleSheet("QHeaderView::section {background-color:lightblue;color: black;padding-left: 4px;border: 1px solid #6c6c6c;font: bold;}")
+
+def addActionColumn(tableView, model, tableName, func):
+    columnPos = model.columnCount() - 1
+    tableView.setColumnHidden(columnPos, False)
+
+    rowCount = model.rowCount()
+    for row in range(rowCount):
+        iconDelete = QtGui.QIcon()
+        iconDelete.addFile('logo/delete1.png')
+        btnDelete = QtWidgets.QPushButton('')
+        btnDelete.setIcon(iconDelete)
+        btnDelete.clicked.connect(lambda:func(model))
+        SymbolCode = model.itemData(model.index(row,0))[0]  #返回dict类型
+        btnDelete.setProperty("row", row)    
+        tableView.setIndexWidget(model.index(row,columnPos), btnDelete) 
