@@ -77,7 +77,7 @@ class Ui_ReportHolding(object):
 
         mainLayout.setStretchFactor(hLayout,1)
         mainLayout.setStretchFactor(groupBox,1)
-        mainLayout.setStretchFactor(self.tableHold,11)
+        mainLayout.setStretchFactor(self.tableHold,12)
         mainLayout.setStretchFactor(self.tableSector,3)
 
         label_MV_CNY.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
@@ -91,7 +91,15 @@ class Ui_ReportHolding(object):
         self.MV_CNY.setFont(QFont("Timers", 20, QFont.Bold))
         self.PL_CNY.setFont(QFont("Timers", 20, QFont.Bold))
         self.MV_HKD.setFont(QFont("Timers", 20, QFont.Bold))
-        self.PL_HKD.setFont(QFont("Timers", 20, QFont.Bold))   
+        self.PL_HKD.setFont(QFont("Timers", 20, QFont.Bold))  
+
+        groupBox.setStyleSheet('''
+            QGroupBox{border: 1px solid gray; background-color: white}
+            ''') 
+        mainLayout.setSpacing(3)
+        mainLayout.setContentsMargins(0, 0, 0, 0)
+        gridEdit.setContentsMargins(0, 0, 0, 0)
+        hLayout.setContentsMargins(0, 0, 0, 0)
         
     def loadReport(self):
 
@@ -136,6 +144,9 @@ class Ui_ReportHolding(object):
             self.PL_CNY.setStyleSheet("color:red;")
         else:
             self.PL_CNY.setStyleSheet("color:black;")
+
+        #解决QLabel setText不即时生效的问题
+        self.MV_CNY.repaint()
 
     def load_sector(self, dfHold):
         dfSector = dfHold[['Sector','MV_CNY']]
