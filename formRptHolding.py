@@ -8,6 +8,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import portfolio
 import DataFrameModel as dfm
+import getData
 
 class Ui_ReportHolding(object):
     def initUI(self, Ui_ReportHolding):
@@ -26,8 +27,12 @@ class Ui_ReportHolding(object):
         self.Acct = QComboBox()
         self.Acct.addItem('ALL')
         self.Acct.addItems(self.acctList)
+        self.Region = QComboBox()
+        self.Region.addItems(['ALL','CHINA','HKSAR'])
+        self.Region.setCurrentIndex(1)
         labelDate = QLabel('Report Date')
         labelAcct = QLabel('Account')
+        labelRegion = QLabel('Region')
         btnReport = QPushButton("RUN REPORT")
         btnReport.clicked.connect(self.loadReport)
         hLayout = QHBoxLayout()
@@ -35,14 +40,16 @@ class Ui_ReportHolding(object):
         hLayout.addWidget(self.Date)
         hLayout.addWidget(labelAcct)
         hLayout.addWidget(self.Acct)
+        hLayout.addWidget(labelRegion)
+        hLayout.addWidget(self.Region)
         hLayout.addStretch()
         hLayout.addWidget(btnReport)
         mainLayout.addLayout(hLayout)
 
-        self.MV_CNY = QLabel()
-        self.PL_CNY = QLabel()
-        self.MV_HKD = QLabel()
-        self.PL_HKD = QLabel()
+        self.MV_CNY = QLabel('0.00')
+        self.PL_CNY = QLabel('0.00')
+        self.MV_HKD = QLabel('0.00')
+        self.PL_HKD = QLabel('0.00')
         label_MV_CNY = QLabel('人民币市值')
         label_PL_CNY = QLabel('人民币盈利')
         label_MV_HKD = QLabel('港币市值')
@@ -57,7 +64,7 @@ class Ui_ReportHolding(object):
         gridEdit.addWidget(label_PL_HKD,0,3)
         gridEdit.addWidget(self.PL_HKD,1,3)
         gridEdit.setRowStretch(0,1)
-        gridEdit.setRowStretch(1,2)        
+        gridEdit.setRowStretch(1,1)        
         groupBox = QGroupBox('')
         groupBox.setLayout(gridEdit)
         mainLayout.addWidget(groupBox)
@@ -65,9 +72,13 @@ class Ui_ReportHolding(object):
         self.tableHold = QTableView()
         mainLayout.addWidget(self.tableHold)
 
+        self.tableSector = QTableView()
+        mainLayout.addWidget(self.tableSector)
+
         mainLayout.setStretchFactor(hLayout,1)
-        mainLayout.setStretchFactor(groupBox,2)
-        mainLayout.setStretchFactor(self.tableHold,10)
+        mainLayout.setStretchFactor(groupBox,1)
+        mainLayout.setStretchFactor(self.tableHold,11)
+        mainLayout.setStretchFactor(self.tableSector,3)
 
         label_MV_CNY.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
         label_PL_CNY.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
@@ -90,7 +101,7 @@ class Ui_ReportHolding(object):
         else:
             strAcct = acct
 
-        dfHold = portfolio.get_hold(self.Date.date().toString('yyyy-MM-dd'), strAcct)
+        dfHold = portfolio.get_hold(self.Date.date().toString('yyyy-MM-dd'), strAcct, self.Region.currentText())
         dfHold = dfHold.sort_values('SymbolCode',ascending=True)
 
         model = dfm.PandasModel(dfHold)
@@ -99,6 +110,7 @@ class Ui_ReportHolding(object):
         self.tableHold.sortByColumn(0,Qt.AscendingOrder)
 
         self.load_sum_factor(dfHold)
+        self.load_sector(dfHold)
 
     def load_sum_factor(self, dfHold):
         df = dfHold[['Cur','MV','PL']]
@@ -125,7 +137,17 @@ class Ui_ReportHolding(object):
         else:
             self.PL_CNY.setStyleSheet("color:black;")
 
-    def deleteSymbol(self,model):
-        btn = self.sender()
-        code = model.data(model.index(btn.property('row'),0)).value()
-        print(code)
+    def load_sector(self, dfHold):
+        dfSector = dfHold[['Sector','MV_CNY']]
+        dfSum = dfSector.groupby(['Sector']).sum()
+        total = dfSector[['MV_CNY']].sum()
+        dfSum['Ratio'] = dfSum.apply(lambda x: round(x['MV_CNY']/total,4),axis=1)
+        dfSum.sort_values(by="Ratio",ascending= False,inplace=True)
+        dfSum.loc['合计'] = [float(total), 1]
+        dfSum['MV_CNY'] = dfSum.apply(lambda x: format(x['MV_CNY'],'0,.2f'),axis=1)
+        dfSum['Ratio'] = dfSum.apply(lambda x: format(x['Ratio'],'.2%'),axis=1)
+        df = dfSum.T
+
+        model = QStandardItemModel()
+        getData.load_table(self.tableSector, model, df)
+

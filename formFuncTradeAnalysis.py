@@ -8,6 +8,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import getData
 import DataFrameModel as dfm
+import datetime
 
 class Ui_funcTradeAnalysis(object):
     def initUI(self, Ui_funcTradeAnalysis):
@@ -198,6 +199,7 @@ class Ui_funcTradeAnalysis(object):
     def insertTrade(self):
         dictData = {}
         dictData['AccountID'] = 'IB'
+        dictData['InputTime'] = datetime.datetime.strftime(datetime.datetime.now(),'%Y-%m-%d %H:%M:%S')
         dictData['Date'] = self.Date.date().toString('yyyy-MM-dd')
         dictData['Time']= self.Time.time().toString('HH:mm:ss')
         dictData['SymbolCode'] = self.SymbolCode.currentText()

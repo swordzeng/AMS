@@ -42,6 +42,7 @@ class Ui_funcSystemMgt(object):
         labelMultiplier = QLabel('Multiplier')
         labelCommission = QLabel('Commission')
         labelSector = QLabel('Sector')
+        labelRegion = QLabel('Region')
 
         self.editSymbolCode = QLineEdit()
         self.editSymbolName = QLineEdit()
@@ -52,11 +53,13 @@ class Ui_funcSystemMgt(object):
         self.editMultiplier = QLineEdit('1')
         self.editCommission = QLineEdit('0')
         self.editSector = QComboBox()
+        self.editRegion = QComboBox()
 
         self.editUnderly.addItems(['','MHI','MCH'])
         self.editAsset.addItems(['EQUITY','BOND','DERIVATIVES','CASH'])
         self.editMarket.addItems(['','SH','SZ','HK'])
         self.editCur.addItems(['CNY','HKD','USD'])
+        self.editRegion.addItems(['','CHINA','HKSAR'])
 
         self.editSector.setEditable(True)
         codeList = getData.get_list('Symbol_Table','Sector')
@@ -84,6 +87,8 @@ class Ui_funcSystemMgt(object):
         gridInput.addWidget(self.editCommission,1,7)
         gridInput.addWidget(labelSector,0,8)
         gridInput.addWidget(self.editSector,0,9)
+        gridInput.addWidget(labelRegion,1,8)
+        gridInput.addWidget(self.editRegion,1,9)
         gridInput.setColumnStretch(0,1)
         gridInput.setColumnStretch(1,1)
         gridInput.setColumnStretch(2,1)
@@ -150,6 +155,7 @@ class Ui_funcSystemMgt(object):
                 dictSymbol['Multiplier'] = self.editMultiplier.text().strip()
                 dictSymbol['Commission'] = self.editCommission.text().strip()
                 dictSymbol['Sector'] = self.editSector.currentText().strip()
+                dictSymbol['Region'] = self.editRegion.currentText().strip()
                 getData.insert_record('Symbol_Table', dictSymbol)
                 self.fill_data()
             else:

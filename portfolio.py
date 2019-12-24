@@ -1,11 +1,14 @@
 import sqlite3
 import requests
 import pandas as pd
+import re
+import json
+import urllib.request
 
-def get_hold(dt, account):
+def get_hold(dt, account, region='ALL'):
     db = sqlite3.connect('AMS.db')
 
-    query = "SELECT SymbolCode, SymbolName, Market, AssetClass,Sector,CurSettle AS Cur FROM Symbol_Table"
+    query = "SELECT SymbolCode, SymbolName, Market, AssetClass,Sector,CurSettle AS Cur,Region FROM Symbol_Table"
     df_symbol = pd.read_sql(query, con=db)
 
     if account.find(',') >=0:
@@ -20,6 +23,12 @@ def get_hold(dt, account):
 
     df_trans = pd.read_sql(query, con = db)
     df_trans = pd.merge(df_trans, df_symbol, on='SymbolCode', how='left')
+
+    if region != 'ALL':
+        if region == 'CHINA':
+            df_trans = df_trans[df_trans['AccountID'].isin(['CITIC','CMS','HUATAI'])]
+        if region == 'HKSAR':
+            df_trans = df_trans[df_trans['AccountID'].isin(['FUTU'])]
 
     #取股票持仓数量
     df_stock = df_trans[~df_trans['AssetClass'].isin(['CASH'])]
@@ -52,7 +61,11 @@ def get_hold(dt, account):
     df_hold = get_realtime_price(df_hold)
     df_hold = cal_factor(df_hold)
 
-    df_hold = df_hold[['SymbolCode','SymbolName','Cur','Qty','CostPrice','Price','MV','PL','Ratio']]
+    hkd_rate = get_exchange_rate('HKD')
+    df_hold['ExRate'] = df_hold.apply(lambda x: hkd_rate if x['Cur']=='HKD' else 1,axis=1)
+    df_hold['MV_CNY'] = df_hold['MV'] * df_hold['ExRate']
+
+    df_hold = df_hold[['SymbolCode','SymbolName','Sector','Cur','Qty','CostPrice','Price','MV','PL','Ratio','MV_CNY']]
     return df_hold
 
 def get_cost(code, qt, df):
@@ -81,14 +94,11 @@ def get_realtime_price(df):
             df.loc[index, 'Price'] = 1.0
         elif row['AssetClass'] == 'EQUITY':
             market = df.loc[index,'Market']
-            code = market.lower() + df.loc[index,'SymbolCode'].split('.')[0]
+            code = market.lower() + str(df.loc[index,'SymbolCode'].split('.')[0]).zfill(5)
             url = 'http://hq.sinajs.cn/?format=text&list={}'.format(code)
             price_text = requests.get(url).text
             price_list = price_text.split(',')
-            if market =='HK':
-                price = price_list[5]
-            else:
-                price = price_list[3]
+            price = price_list[3]
             df.loc[index, 'Price'] = float(price)
 
     return df
@@ -107,3 +117,13 @@ def cal_factor(df):
 
     return df
 
+def get_exchange_rate(cur):
+    url = "http://webforex.hermes.hexun.com/forex/quotelist?code=FOREX{}CNY&column=Code,Price".format(cur)
+    req = urllib.request.Request(url)
+    f = urllib.request.urlopen(req)
+    html = f.read().decode("utf-8")
+    s = re.findall("{.*}",str(html))[0]
+    sjson = json.loads(s)
+    rate = sjson["Data"][0][0][1]/10000
+
+    return rate

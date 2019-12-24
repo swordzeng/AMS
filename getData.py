@@ -96,6 +96,7 @@ class MySymbol:
             self.Multiplier = df.iloc[0]['Multiplier']
             self.Commission = df.iloc[0]['Commission']
             self.Sector = df.iloc[0]['Sector']
+            self.Region = df.iloc[0]['Region']
         else:
             self.Code = ''
             self.Name = ''
@@ -106,4 +107,5 @@ class MySymbol:
             self.curSettle = ''
             self.Multiplier = ''
             self.Commission = 0  
-            self.Sector = ''     
+            self.Sector = ''
+            self.Region = ''    

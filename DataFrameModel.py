@@ -59,7 +59,7 @@ class PandasModel(QtCore.QAbstractTableModel):
                 elif list(self._df.columns)[index.column()].find('Price') >= 0:
                     return QtCore.QVariant('%.3f'%self._df.iloc[index.row(), index.column()])
                 else:
-                    return QtCore.QVariant('%.2f'%self._df.iloc[index.row(), index.column()]) 
+                    return QtCore.QVariant(format(self._df.iloc[index.row(), index.column()],'0,.2f'))
 
         #return QtCore.QVariant(str(self._df.iloc[index.row(), index.column()]))
 

@@ -8,6 +8,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import DataFrameModel as dfm
 import getData
+import datetime
 
 class Ui_funcTradeEntry(object):
     def initUI(self, Ui_funcTradeEntry):
@@ -43,7 +44,7 @@ class Ui_funcTradeEntry(object):
             WHERE AccountID in {} and Date >= '{}' and Date <= '{}' """.format(strAcct,dateStart,dateEnd)
         df = pd.read_sql(query, con = db)
         df['Action'] = ''
-        df.sort_values(by=['Date'], ascending=False, inplace=True)
+        #df.sort_values(by=['Date'], ascending=False, inplace=True)
 
         model = dfm.PandasModel(df)
         self.tableTrade.setModel(model)
@@ -191,6 +192,7 @@ class Ui_funcTradeEntry(object):
     def insertTrade(self):
         dictData = {}
         dictData['AccountID'] = self.Acct.currentText()
+        dictData['InputTime'] = datetime.datetime.strftime(datetime.datetime.now(),'%Y-%m-%d %H:%M:%S')
         dictData['Date'] = self.Date.date().toString('yyyy-MM-dd')
         dictData['Time']= '00:00:00'
         dictData['SymbolCode'] = self.SymbolCode.currentText().split('|')[0].strip()
@@ -219,7 +221,7 @@ class Ui_funcTradeEntry(object):
         qty = 0 if self.Qty.text().strip()=='' else float(self.Qty.text().strip())
         comm = 0 if self.Commission.text().strip()=='' else float(self.Commission.text().strip())
         
-        amtTrade = price * qty
+        amtTrade = abs(price * qty)
 
         strOrderType = self.OrderType.currentText()
         if strOrderType == 'Buy':
