@@ -56,6 +56,10 @@ class PandasModel(QtCore.QAbstractTableModel):
                     return QtCore.QVariant(format(self._df.iloc[index.row(), index.column()],'.2%'))
                 elif list(self._df.columns)[index.column()].find('ID') >= 0:
                     return QtCore.QVariant('%.0f'%self._df.iloc[index.row(), index.column()])
+                elif list(self._df.columns)[index.column()].find('Year') >= 0:
+                    return QtCore.QVariant('%.0f'%self._df.iloc[index.row(), index.column()])
+                elif list(self._df.columns)[index.column()].find('Month') >= 0:
+                    return QtCore.QVariant('%.0f'%self._df.iloc[index.row(), index.column()])
                 elif list(self._df.columns)[index.column()].find('Price') >= 0:
                     return QtCore.QVariant('%.3f'%self._df.iloc[index.row(), index.column()])
                 else:

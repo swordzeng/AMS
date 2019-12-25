@@ -80,18 +80,14 @@ class Ui_ReportHolding(object):
         mainLayout.setStretchFactor(self.tableHold,12)
         mainLayout.setStretchFactor(self.tableSector,3)
 
-        label_MV_CNY.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
-        label_PL_CNY.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
-        label_MV_HKD.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
-        label_PL_HKD.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
-        self.MV_CNY.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
-        self.PL_CNY.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
-        self.MV_HKD.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
-        self.PL_HKD.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
-        self.MV_CNY.setFont(QFont("Timers", 20, QFont.Bold))
-        self.PL_CNY.setFont(QFont("Timers", 20, QFont.Bold))
-        self.MV_HKD.setFont(QFont("Timers", 20, QFont.Bold))
-        self.PL_HKD.setFont(QFont("Timers", 20, QFont.Bold))  
+        for row in range(gridEdit.rowCount()):     
+            for column in range(gridEdit.columnCount()):         
+                item = gridEdit.itemAtPosition(row, column)         
+                if item is not None:             
+                    widget = item.widget() 
+                    widget.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)            
+                    if row == 1:                 
+                        widget.setFont(QFont("Timers", 20, QFont.Bold))
 
         groupBox.setStyleSheet('''
             QGroupBox{border: 1px solid gray; background-color: white}

@@ -13,6 +13,8 @@ import datetime
 class Ui_funcTradeAnalysis(object):
     def initUI(self, Ui_funcTradeAnalysis):
 
+        self.Symbol = getData.MySymbol('')
+
         mainLayout = QVBoxLayout()
         self.setLayout(mainLayout)
 
@@ -32,7 +34,8 @@ class Ui_funcTradeAnalysis(object):
         hLayout.addLayout(vLayout,2)
         mainLayout.addLayout(hLayout)
 
-        self.Symbol = getData.MySymbol('')
+        mainLayout.setSpacing(3)
+        mainLayout.setContentsMargins(0, 0, 0, 0)
 
         self.initEdit()
         self.fill_data()
@@ -195,6 +198,10 @@ class Ui_funcTradeAnalysis(object):
         #gridEdit.setHorizontalSpacing(15)
 
         layout.addLayout(gridEdit)
+
+        layout.setContentsMargins(0, 0, 0, 0)
+        gridEdit.setContentsMargins(0, 0, 0, 0)
+        gridEdit.setSpacing(3)
 
     def insertTrade(self):
         dictData = {}

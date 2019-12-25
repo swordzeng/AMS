@@ -65,7 +65,7 @@ def get_hold(dt, account, region='ALL'):
     df_hold['ExRate'] = df_hold.apply(lambda x: hkd_rate if x['Cur']=='HKD' else 1,axis=1)
     df_hold['MV_CNY'] = df_hold['MV'] * df_hold['ExRate']
 
-    df_hold = df_hold[['SymbolCode','SymbolName','Sector','Cur','Qty','CostPrice','Price','MV','PL','Ratio','MV_CNY']]
+    df_hold = df_hold[['SymbolCode','SymbolName','Sector','Cur','Qty','CostPrice','Price','DayRatio','MV','PL','Ratio','MV_CNY']]
     return df_hold
 
 def get_cost(code, qt, df):
@@ -88,6 +88,7 @@ def get_cost(code, qt, df):
 
 def get_realtime_price(df):
     df['Price'] = 0.0
+    df['DayRatio'] = 0.0
 
     for index, row in df.iterrows():
         if row['AssetClass'] == 'CASH':
@@ -98,8 +99,18 @@ def get_realtime_price(df):
             url = 'http://hq.sinajs.cn/?format=text&list={}'.format(code)
             price_text = requests.get(url).text
             price_list = price_text.split(',')
-            price = price_list[3]
-            df.loc[index, 'Price'] = float(price)
+            
+            if market == 'HK':
+                price = price_list[2]
+                preClose = price_list[3]
+            else:
+                price = price_list[3]
+                preClose = price_list[2]
+            price = float(price)
+            preClose = float(preClose)
+            df.loc[index, 'Price'] = price
+            if preClose != 0:
+                df.loc[index, 'DayRatio'] = round((price-preClose)/preClose,4)
 
     return df
 

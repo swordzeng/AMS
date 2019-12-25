@@ -15,14 +15,14 @@ class Ui_funcTradeEntry(object):
 
         self.acctList = ('CITIC','CMS','HUATAI','FUTU')
 
-        mainLayout = QVBoxLayout()
-        self.setLayout(mainLayout)
+        self.mainLayout = QVBoxLayout()
+        self.setLayout(self.mainLayout)
 
         self.widgetEdit = QWidget()
-        mainLayout.addWidget(self.widgetEdit)
+        self.mainLayout.addWidget(self.widgetEdit)
 
-        self.groupBox = QGroupBox('Trade Records')
-        mainLayout.addWidget(self.groupBox)
+        self.groupBox = QGroupBox()
+        self.mainLayout.addWidget(self.groupBox)
 
         self.Symbol = getData.MySymbol('')
 
@@ -51,7 +51,7 @@ class Ui_funcTradeEntry(object):
         dfm.FormatView(self.tableTrade)
         dfm.addActionColumn(self.tableTrade, model, 'Order_Table', self.deleteSymbol)
         self.tableTrade.sortByColumn(0,Qt.DescendingOrder)
-        self.tableTrade.hideColumn(0)
+        #self.tableTrade.hideColumn(0)
 
     def initEdit(self):
         layout = QVBoxLayout()
@@ -188,6 +188,17 @@ class Ui_funcTradeEntry(object):
         vLayout.addWidget(self.tableTrade)
 
         self.groupBox.setLayout(vLayout)
+
+        self.groupBox.setStyleSheet('''
+            QGroupBox{border: 1px solid gray;}
+            ''') 
+        self.mainLayout.setSpacing(3)
+        self.mainLayout.setContentsMargins(0, 0, 0, 0)
+        gridEdit.setContentsMargins(0, 0, 0, 0)
+        gridEdit.setSpacing(3)
+        hLayout.setContentsMargins(0, 0, 0, 0)
+        vLayout.setContentsMargins(0, 0, 0, 0)
+        vLayout.setSpacing(3)
 
     def insertTrade(self):
         dictData = {}
