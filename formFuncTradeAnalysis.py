@@ -237,21 +237,23 @@ class Ui_funcTradeAnalysis(object):
         qty = 0 if self.Qty.text().strip()=='' else float(self.Qty.text().strip())
         comm = 0 if self.Commission.text().strip()=='' else float(self.Commission.text().strip())
         
-        amtTrade = price * qty * self.Symbol.Multiplier
+        amtTrade = abs(price * qty * self.Symbol.Multiplier)
 
         strBuySell = self.BuySell.currentText().split('-')[1]
         if strBuySell == 'Buy':
-            amtSettle = -1 * (amtTrade + qty * comm)
+            amtSettle = -1 * (amtTrade + abs(qty) * comm)
         else:
-            amtSettle = amtTrade - qty * comm
+            amtSettle = amtTrade - abs(qty) * comm
 
         self.TradeAmt.setText(str(amtTrade))
         self.SettleAmt.setText(str(amtSettle)) 
 
-    def deleteSymbol(self,table):
+    def deleteSymbol(self,model):
         btn = self.sender()
         db = sqlite3.connect('AMS.db')
-        query = "DELETE FROM " + table + " WHERE ID = " + str(btn.property('ID'))
+        transID = model.data(model.index(btn.property('row'),0)).value()
+        print(transID)
+        query = "DELETE FROM Order_Table WHERE ID = " + str(transID)
         print(query)
         cursor = db.cursor()
         cursor.execute(query)
