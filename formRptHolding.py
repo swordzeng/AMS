@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import *
 import portfolio
 import DataFrameModel as dfm
 import getData
+import datetime
 
 class Ui_ReportHolding(object):
     def initUI(self, Ui_ReportHolding):
@@ -33,6 +34,7 @@ class Ui_ReportHolding(object):
         labelDate = QLabel('Report Date')
         labelAcct = QLabel('Account')
         labelRegion = QLabel('Region')
+        self.labelTime = QLabel('')
         btnReport = QPushButton("RUN REPORT")
         btnReport.clicked.connect(self.loadReport)
         hLayout = QHBoxLayout()
@@ -43,6 +45,7 @@ class Ui_ReportHolding(object):
         hLayout.addWidget(labelRegion)
         hLayout.addWidget(self.Region)
         hLayout.addStretch()
+        hLayout.addWidget(self.labelTime)
         hLayout.addWidget(btnReport)
         mainLayout.addLayout(hLayout)
 
@@ -99,6 +102,8 @@ class Ui_ReportHolding(object):
         
     def loadReport(self):
 
+        self.labelTime.setText('')
+
         acct = self.Acct.currentText()
         if acct == 'ALL':
             strAcct = str(self.acctList)
@@ -115,6 +120,8 @@ class Ui_ReportHolding(object):
 
         self.load_sum_factor(dfHold)
         self.load_sector(dfHold)
+
+        self.labelTime.setText(datetime.datetime.strftime(datetime.datetime.now(),'%H:%M:%S'))
 
     def load_sum_factor(self, dfHold):
         df = dfHold[['Cur','MV','PL']]
