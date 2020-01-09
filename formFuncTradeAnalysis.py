@@ -126,7 +126,7 @@ class Ui_funcTradeAnalysis(object):
         codeList.insert(0,'')
         codeList = [str(i) for i in codeList]
         self.SymbolCode.addItems(codeList)
-        self.OrderID.addItems(list(map(str,range(1,10))))
+        self.OrderID.addItems(list(map(str,range(1,17))))
         self.TradeID.addItems(list(map(str,range(1,10))))
         self.Cur.addItems(['HKD','CNY','USD'])
         self.BuySell.addItems(['Open-Buy','Open-Sell','Close-Buy','Close-Sell'])
@@ -143,6 +143,7 @@ class Ui_funcTradeAnalysis(object):
         self.SettleAmt.setStyleSheet("background-color:rgb(225,225,225)")
 
         self.SymbolCode.currentIndexChanged.connect(self.codeChanged)
+        self.BuySell.currentIndexChanged.connect(self.typeChanged)
         self.BuySell.currentIndexChanged.connect(self.amtCal)
         self.Price.editingFinished.connect(self.amtCal)
         self.Qty.editingFinished.connect(self.amtCal)
@@ -231,6 +232,13 @@ class Ui_funcTradeAnalysis(object):
         self.Symbol = getData.MySymbol(self.SymbolCode.currentText())
         self.Commission.setText(str(self.Symbol.Commission))
         self.Cur.setCurrentText(self.Symbol.curSettle)
+
+    def typeChanged(self):
+        strBuySell = self.BuySell.currentText().split('-')[1]
+        if strBuySell == 'Buy':
+            self.Qty.setText(str(1))
+        else:
+            self.Qty.setText(str(-1))
 
     def amtCal(self):
         price = 0 if self.Price.text().strip()=='' else float(self.Price.text().strip())
