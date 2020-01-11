@@ -7,6 +7,7 @@ from formRptHolding import Ui_ReportHolding
 from formFuncTradeAnalysis import Ui_funcTradeAnalysis
 from formFuncSystemMgt import Ui_funcSystemMgt
 from formFuncTradeEntry import Ui_funcTradeEntry
+from formFuncJobs import Ui_Jobs
 
 class Ui_MainWindow(QMainWindow):
     def __init__(self, parent=None):
@@ -21,6 +22,7 @@ class Ui_MainWindow(QMainWindow):
         self.UI_FUNC_TRADE_ENTRY = 'FUNCTION TRANDE ENTRY'
         self.UI_FUNC_TRADE_ANALYSIS = 'FUNCTION TRADE ANALYSIS'
         self.UI_FUNC_SYSTEM_MGT = "FUNCTION SYSMTEM MANAGEMENT"
+        self.UI_FUNC_JOBS = "FUNCTION JOBS"
 
         #初始化页面
         self.formReportSummary = initRptDailySummary()
@@ -28,6 +30,7 @@ class Ui_MainWindow(QMainWindow):
         self.formFuncTradeEntry = initFuncTradeEntry()
         self.formFuncSystemMgt = initFuncSysMgt()
         self.formFuncTradeAnalysis = initFuncTradeAnalysis()
+        self.formFuncJobs = initFuncJobs()
 
         #MainWindow已经有默认layout，不能直接set layout，不然会报警告
         mainWidget = QWidget()
@@ -69,6 +72,7 @@ class Ui_MainWindow(QMainWindow):
         menuFunc = QMenu()
         menuFunc.addAction("交易管理",lambda:self.changeUI(self.UI_FUNC_TRADE_ENTRY))
         menuFunc.addAction("系统管理",lambda:self.changeUI(self.UI_FUNC_SYSTEM_MGT))
+        menuFunc.addAction("作业管理",lambda:self.changeUI(self.UI_FUNC_JOBS))
         btnFunc.setMenu(menuFunc)
 
         btnSpace = QPushButton("")
@@ -107,6 +111,8 @@ class Ui_MainWindow(QMainWindow):
             form = self.formFuncTradeAnalysis
         if name == self.UI_FUNC_SYSTEM_MGT:
             form = self.formFuncSystemMgt
+        if name == self.UI_FUNC_JOBS:
+            form = self.formFuncJobs
 
         self.mainSplitter.widget(0).setParent(None)
         self.mainSplitter.insertWidget(0, form)
@@ -114,6 +120,12 @@ class Ui_MainWindow(QMainWindow):
 class initRptDailySummary(QWidget, Ui_DailySummary):
     def __init__(self):
         super(initRptDailySummary,self).__init__()
+        #子窗口初始化时实现子窗口布局
+        self.initUI(self)
+
+class initFuncJobs(QWidget, Ui_Jobs):
+    def __init__(self):
+        super(initFuncJobs,self).__init__()
         #子窗口初始化时实现子窗口布局
         self.initUI(self)
 

@@ -3,6 +3,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from DataFrameModel import PandasModel
 import pandas as pd
+import sqlite3
  
 
 class Ui_DailySummary(object):
@@ -80,14 +81,17 @@ class Ui_DailySummary(object):
         mainLayout.setSpacing(0)
 
         #提取默认参数值
-        self.rptDate = dtEdit.date().toString('yyyyMMdd')
+        self.rptDate = dtEdit.date().toString('yyyy-MM-dd')
         self.rptAcct = comboAcct.currentText()
 
         #btnFunc.setIcon(QtGui.QIcon("mesh.png"))
         btnReport.setStyleSheet("background-image:url(./logo/current.png);background-color:#87ba50")
 
     def loadReport(self):
-        df = pd.read_excel('A_Shares.xlsx',sheet_name='Trans')
+        db = sqlite3.connect('AMS.db')
+        query = "select * from Holding_Table where Date = '{}'".format(self.rptDate)
+        print(query)
+        df = pd.read_sql(query, con = db)
         model = PandasModel(df)
         self.tblHold.setModel(model)
         self.tblHold.setSortingEnabled(True)
@@ -97,4 +101,5 @@ class Ui_DailySummary(object):
         self.rptAcct = str
 
     def saveDate(self, date):
-        self.rptDate = date.toString('yyyyMMdd')
+        self.rptDate = date.toString('yyyy-MM-dd')
+        
