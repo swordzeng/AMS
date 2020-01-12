@@ -5,6 +5,14 @@ import re
 import json
 import urllib.request
 
+def cal_daily_hold(dt, acct):
+    pass
+    #复制前一日持仓
+    #计算当日买入
+    #计算当日卖出
+    #合并
+    #计算剩余指标
+
 def get_hold(dt, account, region='ALL'):
     db = sqlite3.connect('AMS.db')
 

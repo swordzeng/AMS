@@ -5,27 +5,44 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import pandas as pd
 import sqlite3
+import datetime
 
 class Ui_Jobs(object):
     def initUI(self, Ui_Jobs):
-        self.initEdit()
+        self.mainLayout = QVBoxLayout()
+        self.setLayout(self.mainLayout)
+
+        self.initHoldingCal()
+        self.mainLayout.addStretch()
+
+        self.check_status()
 
     def Cal_Holding(self):
         if self.HoldingStatus.text() == '':
-            self.HoldingStatus.setText('Everything is up to date .......................')
+            self.check_status()
         else:
             self.HoldingStatus.setText('')
 
-    def check_status(self):
+    def max_holding(self):
         db = sqlite3.connect('AMS.db')
         query = "select max(Date) as 'Date' from Holding_Table"
         df = pd.read_sql(query, con = db)
-        print(df.loc[0,'Date'])
+        dayMax = datetime.datetime.strptime(df.loc[0,'Date'], "%Y-%m-%d").date()
+        
+        return dayMax
 
-    def initEdit(self):
-        mainLayout = QVBoxLayout()
-        self.setLayout(mainLayout)
+    def check_status(self):
+        dayMax = self.max_holding()
+        strStatus = 'Max Holding Date: ' + datetime.datetime.strftime(dayMax, '%Y-%m-%d')
+        self.HoldingStatus.setText(strStatus)
 
+        timeDelta = (QDate.currentDate().toPyDate() - dayMax).days
+        if timeDelta > 1:
+            self.HoldingStatus.setStyleSheet("color:red;")
+        else:
+            self.HoldingStatus.setStyleSheet("color:black;")
+
+    def initHoldingCal(self):
         groupHolding = QGroupBox()
         groupHoldingLayout = QVBoxLayout()
         groupHolding.setLayout(groupHoldingLayout)
@@ -37,10 +54,17 @@ class Ui_Jobs(object):
         labelHoldingTitle.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
         layoutHoldingTitle.addWidget(labelHoldingTitle)
 
+        dayMax = self.max_holding()
+        dayStart = dayMax + datetime.timedelta(days=1)
+
         labelStart = QLabel("Date Start")
         labelEnd = QLabel("Date End")
-        self.DateStart = QDateEdit()
+        self.DateStart = QDateEdit(dayStart)
         self.DateEnd = QDateEdit(QDate.currentDate())
+        self.DateStart.setCalendarPopup(True)
+        self.DateEnd.setCalendarPopup(True)
+        self.DateStart.setMaximumDate(QDate.currentDate())
+        self.DateEnd.setMaximumDate(QDate.currentDate())
         self.HoldingStatus = QLabel('')
         self.btnCalHold = QPushButton('Cal Holding')
         self.btnCalHold.clicked.connect(self.Cal_Holding)
@@ -68,10 +92,7 @@ class Ui_Jobs(object):
         layoutHoldingTitle.setContentsMargins(10, 10, 10, 0)
         layoutHolding.setContentsMargins(10, 0, 10, 10)
 
-        mainLayout.addWidget(groupHolding)
-        mainLayout.addStretch()
-
-        self.check_status()
+        self.mainLayout.addWidget(groupHolding)
         
 
 

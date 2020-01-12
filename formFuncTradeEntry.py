@@ -53,6 +53,19 @@ class Ui_funcTradeEntry(object):
         self.tableTrade.sortByColumn(0,Qt.DescendingOrder)
         #self.tableTrade.hideColumn(0)
 
+    def get_symbol_list(self):
+        self.SymbolCode.clear()
+
+        codeList = getData.get_list('Symbol_Table','SymbolCode')
+        codeList.insert(0,'')
+        listSymbol = []
+        i = 0
+        for code in codeList:
+            codeSymbol = getData.MySymbol(code)
+            listSymbol.insert(i, codeSymbol.Code.ljust(10,' ') + ' | ' + codeSymbol.Name)
+            i = i + 1
+        self.SymbolCode.addItems(listSymbol)
+
     def initEdit(self):
         layout = QVBoxLayout()
         self.widgetEdit.setLayout(layout)
@@ -82,15 +95,7 @@ class Ui_funcTradeEntry(object):
         self.Acct.addItems(self.acctList)
         self.Date.setCalendarPopup(True)
         self.Date.setMaximumDate(QDate.currentDate())
-        codeList = getData.get_list('Symbol_Table','SymbolCode')
-        codeList.insert(0,'')
-        listSymbol = []
-        i = 0
-        for code in codeList:
-            codeSymbol = getData.MySymbol(code)
-            listSymbol.insert(i, codeSymbol.Code.ljust(10,' ') + ' | ' + codeSymbol.Name)
-            i = i + 1
-        self.SymbolCode.addItems(listSymbol)
+        self.get_symbol_list()
         self.Cur.addItems(['HKD','CNY','USD'])
         self.OrderType.addItems(['Buy','Sell','Deposit','Withdraw','Bonus','Interest'])
 
@@ -136,6 +141,10 @@ class Ui_funcTradeEntry(object):
         btnInsert = QPushButton('INSERT')
         btnInsert.clicked.connect(self.insertTrade)
         gridEdit.addWidget(btnInsert,3,9,1,2)
+
+        btnRefreshSymbol = QPushButton('Refresh Symbol')
+        btnRefreshSymbol.clicked.connect(self.get_symbol_list)
+        gridEdit.addWidget(btnRefreshSymbol,3,0,1,2)
 
         gridEdit.setColumnStretch(0,1)
         gridEdit.setColumnStretch(1,2)
