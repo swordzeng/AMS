@@ -111,7 +111,7 @@ class Ui_funcTradeAnalysis(object):
         self.BuySell = QComboBox()
         self.Price = QLineEdit('0')
         self.Cur = QComboBox()
-        self.Qty = QLineEdit('0')
+        self.Qty = QLineEdit('1')
         self.TradeAmt = QLineEdit('0')
         self.Commission = QLineEdit('0')
         self.SettleAmt = QLineEdit('0')
