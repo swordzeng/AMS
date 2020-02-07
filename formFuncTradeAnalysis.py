@@ -29,9 +29,9 @@ class Ui_funcTradeAnalysis(object):
         vLayout = QVBoxLayout()
         vLayout.addWidget(self.tableDayPL,2)
         vLayout.addWidget(self.tableMonthPL,1)
-        hLayout.addWidget(self.tableTrade,5)
-        hLayout.addWidget(self.tableOrderPL,2)
-        hLayout.addLayout(vLayout,2)
+        hLayout.addWidget(self.tableTrade,7)
+        hLayout.addWidget(self.tableOrderPL,3)
+        hLayout.addLayout(vLayout,3)
         mainLayout.addLayout(hLayout)
 
         mainLayout.setSpacing(3)
@@ -182,7 +182,7 @@ class Ui_funcTradeAnalysis(object):
 
         btnInsert = QPushButton('INSERT')
         btnInsert.clicked.connect(self.insertTrade)
-        gridEdit.addWidget(btnInsert,3,10,1,2)
+        gridEdit.addWidget(btnInsert,1,12)
 
         gridEdit.setColumnStretch(0,1)
         gridEdit.setColumnStretch(1,2)
@@ -196,13 +196,19 @@ class Ui_funcTradeAnalysis(object):
         gridEdit.setColumnStretch(9,2)
         gridEdit.setColumnStretch(10,1)
         gridEdit.setColumnStretch(11,2)
+        gridEdit.setColumnStretch(12,2)
         #gridEdit.setHorizontalSpacing(15)
 
         layout.addLayout(gridEdit)
 
-        layout.setContentsMargins(0, 0, 0, 0)
-        gridEdit.setContentsMargins(0, 0, 0, 0)
+        #layout.setContentsMargins(0, 0, 0, 0)
+        #gridEdit.setContentsMargins(0, 0, 0, 0)
         gridEdit.setSpacing(3)
+
+        self.widgetEdit.setStyleSheet('''
+            QWidget{border: 1px solid gray;}
+            QLabel{border: none;}
+            ''')
 
     def insertTrade(self):
         dictData = {}

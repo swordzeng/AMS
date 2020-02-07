@@ -16,7 +16,7 @@ def cal_daily_hold(dt, acct):
 def get_hold(dt, account, region='ALL'):
     db = sqlite3.connect('AMS.db')
 
-    query = "SELECT SymbolCode, SymbolName, Market, AssetClass,Sector,CurSettle AS Cur,Region FROM Symbol_Table"
+    query = "SELECT SymbolCode, SymbolName, Exchange, AssetClass,Sector,CurSettle AS Cur,Region FROM Symbol_Table"
     df_symbol = pd.read_sql(query, con=db)
 
     if account.find(',') >=0:
@@ -102,13 +102,13 @@ def get_realtime_price(df):
         if row['AssetClass'] == 'CASH':
             df.loc[index, 'Price'] = 1.0
         elif row['AssetClass'] == 'EQUITY':
-            market = df.loc[index,'Market']
-            code = market.lower() + str(df.loc[index,'SymbolCode'].split('.')[0]).zfill(5)
+            Exchange = df.loc[index,'Exchange']
+            code = Exchange.lower() + str(df.loc[index,'SymbolCode'].split('.')[0]).zfill(5)
             url = 'http://hq.sinajs.cn/?format=text&list={}'.format(code)
             price_text = requests.get(url).text
             price_list = price_text.split(',')
             
-            if market == 'HK':
+            if Exchange == 'HKEX':
                 price = price_list[2]
                 preClose = price_list[3]
             else:

@@ -163,5 +163,5 @@ class Ui_ReportHolding(object):
         df = dfSum.T
 
         model = QStandardItemModel()
-        getData.load_table(self.tableSector, model, df)
+        dfm.load_table(self.tableSector, model, df)
 

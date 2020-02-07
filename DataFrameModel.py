@@ -118,3 +118,54 @@ def addActionColumn(tableView, model, tableName, func):
         SymbolCode = model.itemData(model.index(row,0))[0]  #返回dict类型
         btnDelete.setProperty("row", row)    
         tableView.setIndexWidget(model.index(row,columnPos), btnDelete) 
+
+def load_table(tableView, model, df):
+    #db = sqlite3.connect('AMS.db')
+    #query = "select * from " + tableName + condition
+    #df = pd.read_sql(query, con = db)
+    rowCount = df.shape[0]
+    columnCount = df.shape[1]
+    model.setRowCount = rowCount
+    model.setColumnCount = columnCount + 1  #添加一列作为操作列，默认不显示
+    headName = list(df)
+    headName.append('Action')
+    model.setHorizontalHeaderLabels(headName)
+    for row in range(rowCount):
+        for column in range(columnCount):
+            item = QtGui.QStandardItem()
+            item.setTextAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
+            
+            itemValue = df.iloc[row,column]
+            if type(itemValue).__name__ == 'int64':
+                itemValue = int(itemValue)
+            if type(itemValue).__name__ == 'float64':
+                itemValue = float(itemValue)
+                if itemValue < 0:
+                    item.setForeground(QBrush(QColor(255, 0, 0)))
+                itemValue = '{:.2f}'.format(itemValue)
+            
+            '''
+            try:
+                itemValue = float(df.iloc[row,column])
+            except BaseException:
+                itemValue = df.iloc[row,column]
+            else:
+                itemValue = QVariant('%.2f'%df.iloc[row,column])
+                if itemValue < 0:
+                    item.setForeground(QBrush(QColor(255, 0, 0)))
+            '''
+            item.setData(itemValue, QtCore.Qt.DisplayRole)
+            #item.setEditable(False)
+            model.setItem(row, column, item)
+
+    tableView.setModel(model)
+
+    tableView.setColumnHidden(columnCount, True)    #默认隐藏action列
+    tableView.verticalHeader().setHidden(True)      #隐藏行号
+    tableView.setSortingEnabled(True)
+    #水平方向标签拓展剩下的窗口部分，填满表格
+    #tableWidget.horizontalHeader().setStretchLastSection(True)
+    #水平方向，表格大小拓展到适当的尺寸      
+    tableView.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+    tableView.resizeColumnsToContents()
+    tableView.horizontalHeader().setStyleSheet("QHeaderView::section {background-color:lightblue;color: black;padding-left: 4px;border: 1px solid #6c6c6c;font: bold;}")

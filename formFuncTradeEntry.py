@@ -140,11 +140,11 @@ class Ui_funcTradeEntry(object):
 
         btnInsert = QPushButton('INSERT')
         btnInsert.clicked.connect(self.insertTrade)
-        gridEdit.addWidget(btnInsert,3,9,1,2)
+        gridEdit.addWidget(btnInsert,1,10)
 
         btnRefreshSymbol = QPushButton('Refresh Symbol')
         btnRefreshSymbol.clicked.connect(self.get_symbol_list)
-        gridEdit.addWidget(btnRefreshSymbol,3,0,1,2)
+        gridEdit.addWidget(btnRefreshSymbol,0,10)
 
         gridEdit.setColumnStretch(0,1)
         gridEdit.setColumnStretch(1,2)
@@ -156,6 +156,7 @@ class Ui_funcTradeEntry(object):
         gridEdit.setColumnStretch(7,2)
         gridEdit.setColumnStretch(8,1)
         gridEdit.setColumnStretch(9,2)
+        gridEdit.setColumnStretch(10,2)
         #gridEdit.setHorizontalSpacing(15)
 
         layout.addLayout(gridEdit)
@@ -201,13 +202,21 @@ class Ui_funcTradeEntry(object):
         self.groupBox.setStyleSheet('''
             QGroupBox{border: 1px solid gray;}
             ''') 
-        self.mainLayout.setSpacing(3)
+        self.widgetEdit.setStyleSheet('''
+            QWidget{border: 1px solid gray;}
+            QComboBox{border: 1px solid gray;}
+            QLineEdit{border: 1px solid gray;}
+            QPushButton{border: 1px solid gray;}
+            QLabel{border: none;}
+            ''')
+        self.mainLayout.setSpacing(6)
         self.mainLayout.setContentsMargins(0, 0, 0, 0)
-        gridEdit.setContentsMargins(0, 0, 0, 0)
+        #gridEdit.setContentsMargins(0, 0, 0, 0)
         gridEdit.setSpacing(3)
         hLayout.setContentsMargins(0, 0, 0, 0)
         vLayout.setContentsMargins(0, 0, 0, 0)
-        vLayout.setSpacing(3)
+        vLayout.setSpacing(0)
+        hLayout.setSpacing(6)
 
     def insertTrade(self):
         dictData = {}
