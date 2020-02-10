@@ -66,7 +66,7 @@ def get_hold(dt, account, region='ALL'):
     
     df_hold['Date'] = dt
 
-    df_hold = get_realtime_price(df_hold)
+    df_hold = get_realtime_price_sina(df_hold)
     df_hold = cal_factor(df_hold)
 
     hkd_rate = get_exchange_rate('HKD')
@@ -94,7 +94,7 @@ def get_cost(code, qt, df):
     
     return amt_cost
 
-def get_realtime_price(df):
+def get_realtime_price_sina(df):
     df['Price'] = 0.0
     df['DayRatio'] = 0.0
 
@@ -103,6 +103,12 @@ def get_realtime_price(df):
             df.loc[index, 'Price'] = 1.0
         elif row['AssetClass'] == 'EQUITY':
             Exchange = df.loc[index,'Exchange']
+            if Exchange == 'HKEX':
+                Exchange = 'HK'
+            elif Exchange == 'SSE':
+                Exchange = 'SH'
+            elif Exchange == 'SZSE':
+                Exchange = 'SZ'
             code = Exchange.lower() + str(df.loc[index,'SymbolCode'].split('.')[0]).zfill(5)
             url = 'http://hq.sinajs.cn/?format=text&list={}'.format(code)
             price_text = requests.get(url).text
