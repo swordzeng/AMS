@@ -1,35 +1,39 @@
 from alpha_vantage.timeseries import TimeSeries
 from alpha_vantage.foreignexchange import ForeignExchange
-import tushare as ts
+import tushare
 import pandas as pd
 import db_service
 import traceback
 import time
 
 ALPHA_VANTAGE_KEY = 'PHOPU7GYO084YDMT'
-ts.set_token('afc4e40c16f034b23840195764b992b74cbd76c7964eb150afe496d6')
+TUSHARE_KEY ='afc4e40c16f034b23840195764b992b74cbd76c7964eb150afe496d6'
 
 def get_close_price(symbol,startDate='',endDate=''):
+    '''
     # alpha vantage每分钟只能提取五只股票数据，国内股票用tushare替代
     if symbol.split('.')[1].strip().upper() in ['SS','SZ']:
-        start_date = '2019-12-01' if startDate == '' else startDate
+        start_date = '2019-12-31' if startDate == '' else startDate
         end_date = time.strftime("%Y-%m-%d") if endDate == '' else endDate
         start_date = start_date.replace('-', '')
         end_date = end_date.replace('-', '')
         symbolCode = symbol.replace(".SS", ".SH")
-        data = ts.pro_bar(ts_code=symbolCode, start_date=start_date, end_date=end_date)
+        #local variable 'ts' referenced before assignment
+        tushare.set_token(TUSHARE_KEY)
+        data = tushare.pro_bar(ts_code=symbolCode, start_date=start_date, end_date=end_date)
         close = data.loc[:, ('trade_date','ts_code','close')]
         close.rename(columns={'trade_date':'Date','ts_code':'SymbolCode','close':'Close'},inplace=True)
         close['Date'] = close.apply(lambda x: x['Date'][0:4]+'-'+x['Date'][4:6]+'-'+x['Date'][6:], axis=1)
         close['SymbolCode'] = symbol
     else:
-        ts = TimeSeries(key=ALPHA_VANTAGE_KEY, output_format='pandas', indexing_type='date')
-        data, meta_data = ts.get_daily(symbol)
-        data.reset_index(inplace=True)
-        close = data.loc[:, ('date','4. close')]
-        close.rename(columns={'date':'Date','4. close':'Close'},inplace=True)
-        close.insert(1,'SymbolCode',symbol)
-        pd.to_datetime(close['Date'], unit='s').dt.strftime('%Y-%m-%d')     #将Timestamp转换为字符串
+    '''
+    ts = TimeSeries(key=ALPHA_VANTAGE_KEY, output_format='pandas', indexing_type='date')
+    data, meta_data = ts.get_daily(symbol)
+    data.reset_index(inplace=True)
+    close = data.loc[:, ('date','4. close')]
+    close.rename(columns={'date':'Date','4. close':'Close'},inplace=True)
+    close.insert(1,'SymbolCode',symbol)
+    close['Date'] = close.apply(lambda x: x['Date'].strftime('%Y-%m-%d'),axis=1)
     
     return close
 
@@ -71,21 +75,42 @@ def get_exchange_rate(cur):
     exRate = data.loc[:, ('date','4. close')]
     exRate.rename(columns={'date':'Date','4. close':'Close'},inplace=True)
     exRate.insert(1,'SymbolCode',cur)
-    pd.to_datetime(exRate['Date'], unit='s').dt.strftime('%Y-%m-%d')
+    exRate['Date'] = exRate.apply(lambda x: x['Date'].strftime('%Y-%m-%d'),axis=1)
     
     return exRate
 
-def save_close_price(symbol):
-    for code in symbol:
+def save_close_price(symbol=''):
+    if symbol=='':
+        symbolList = db_service.get_symbol_for_close_price()
+    elif type(symbol) is str:
+        symbolList = []
+        symbolList.append(symbol)
+    else:
+        symbolList = symbol
+
+    # alpha vantage 每分钟只能提取五个代码数据，满五个停一分钟再继续
+    count = 0
+
+    print(symbolList)
+    for code in symbolList:
+        print(code + ' & ' + str(count))
         try:
+            if count >= 5:
+                print('sleep 60 seconds')
+                time.sleep(60)  #休眠60秒
+                count = 1
+            else:
+                count = count + 1
+
             maxDate = db_service.get_latest_date('Close_Price','SymbolCode',code)
+            maxDate = '2019-12-30' if maxDate == '2019-12-31' else maxDate
             dfClose = get_close_price(code)
             dfClose = dfClose.loc[dfClose["Date"] > maxDate]
             db_service.table_append(dfClose,'Close_Price')
         except Exception as e:
-            #print('Error: Close price of Symbol: {} failed!'.format(code))
-            #print(repr(e))
-            traceback.print_exc()
+            print('Error: Close price of Symbol: {} failed!'.format(code))
+            print(repr(e))
+            #traceback.print_exc()
         else:
             print('Close price of Symbol : {} successful!'.format(code))
 
@@ -93,9 +118,10 @@ def save_exchange_rate(symbol=['HKD','USD']):
     for code in symbol:
         try:
             maxDate = db_service.get_latest_date('Close_Price','SymbolCode',code)
+            maxDate = '2019-12-30' if maxDate == '2019-12-31' else maxDate
             dfClose = get_exchange_rate(code)
             dfClose = dfClose.loc[dfClose["Date"] > maxDate]
-            db_service.table_append(dfClose,'Close_Price')
+            db_service.table_append(dfClose,'Exchange_Rate')
         except Exception as e:
             traceback.print_exc()
         else:

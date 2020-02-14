@@ -129,7 +129,10 @@ class Ui_funcTradeAnalysis(object):
         self.OrderID.addItems(list(map(str,range(1,17))))
         self.TradeID.addItems(list(map(str,range(1,10))))
         self.Cur.addItems(['HKD','CNY','USD'])
+        
+        listBuySell = QListView(self.BuySell)
         self.BuySell.addItems(['Open-Buy','Open-Sell','Close-Buy','Close-Sell'])
+        self.BuySell.setView(listBuySell)
 
         self.TradeAmt.setReadOnly(True)
         self.SettleAmt.setReadOnly(True)
@@ -208,6 +211,7 @@ class Ui_funcTradeAnalysis(object):
         self.widgetEdit.setStyleSheet('''
             QWidget{border: 1px solid gray;}
             QLabel{border: none;}
+            QListView::item:selected { background: blue; } 
             ''')
 
     def insertTrade(self):
