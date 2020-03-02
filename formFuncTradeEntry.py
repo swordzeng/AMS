@@ -250,7 +250,7 @@ class Ui_funcTradeEntry(object):
         qty = 0 if self.Qty.text().strip()=='' else float(self.Qty.text().strip())
         comm = 0 if self.Commission.text().strip()=='' else float(self.Commission.text().strip())
         
-        amtTrade = abs(price * qty)
+        amtTrade = round(abs(price * qty),2)
 
         strOrderType = self.OrderType.currentText()
         if strOrderType == 'Buy':

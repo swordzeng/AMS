@@ -8,6 +8,9 @@ from formFuncTradeAnalysis import Ui_funcTradeAnalysis
 from formFuncSystemMgt import Ui_funcSystemMgt
 from formFuncTradeEntry import Ui_funcTradeEntry
 from formFuncJobs import Ui_Jobs
+import cal_service as cal
+import threading
+import time
 
 class Ui_MainWindow(QMainWindow):
     def __init__(self, parent=None):
@@ -149,11 +152,22 @@ class initFuncTradeEntry(QWidget, Ui_funcTradeEntry):
         super(initFuncTradeEntry,self).__init__()
         self.initUI(self)
 
+def initJobs(self):
+    #t = time.localtime(time.time())
+    #if t.tm_hour > 17:
+    cal.save_close_price()
+    time.sleep(60)
+    cal.save_exchange_rate()
+    print('Init jobs finished')
+
 if __name__ == '__main__':
     #字体大小自适应分辨率
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
-
     app = QApplication(sys.argv)
     ui = Ui_MainWindow()
     ui.show()
+
+    t1 = threading.Thread(target=initJobs, args=("t1",))
+    t1.start()
+
     sys.exit(app.exec_())

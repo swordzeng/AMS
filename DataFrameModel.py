@@ -95,14 +95,17 @@ class PandasModel(QtCore.QAbstractTableModel):
         self.layoutChanged.emit()
 
 
-def FormatView(view):
+def FormatView(view,columnCount=0):
     view.setSortingEnabled(True)
     view.verticalHeader().setHidden(True)
     #水平方向，表格大小拓展到适当的尺寸      
-    view.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+    #view.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+    if columnCount != 0:
+        view.horizontalHeader().setSectionResizeMode(columnCount-1, QtWidgets.QHeaderView.Stretch)
     view.resizeColumnsToContents()
     view.setAlternatingRowColors(True)
     view.horizontalHeader().setStyleSheet("QHeaderView::section {background-color:lightblue;color: black;padding-left: 4px;border: 1px solid #6c6c6c;font: bold;}")
+    #view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
 
 def addActionColumn(tableView, model, tableName, func):
     columnPos = model.columnCount() - 1

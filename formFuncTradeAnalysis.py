@@ -51,7 +51,7 @@ class Ui_funcTradeAnalysis(object):
         df['Action'] = ''
         model = dfm.PandasModel(df)
         self.tableTrade.setModel(model)
-        dfm.FormatView(self.tableTrade)
+        dfm.FormatView(self.tableTrade, model.columnCount())
         dfm.addActionColumn(self.tableTrade, model, 'XXX', self.deleteSymbol)
         self.tableTrade.hideColumn(0)
         self.tableTrade.sortByColumn(0,0)
@@ -76,15 +76,15 @@ class Ui_funcTradeAnalysis(object):
 
         modelOrderPL = dfm.PandasModel(dfOrderPL)
         self.tableOrderPL.setModel(modelOrderPL)
-        dfm.FormatView(self.tableOrderPL)
+        dfm.FormatView(self.tableOrderPL, modelOrderPL.columnCount())
 
         modelDayPL = dfm.PandasModel(dfDayPL)
         self.tableDayPL.setModel(modelDayPL)
-        dfm.FormatView(self.tableDayPL)
+        dfm.FormatView(self.tableDayPL, modelDayPL.columnCount())
 
         modelMonthPL = dfm.PandasModel(dfMonthPL)
         self.tableMonthPL.setModel(modelMonthPL)
-        dfm.FormatView(self.tableMonthPL)
+        dfm.FormatView(self.tableMonthPL, modelMonthPL.columnCount())
 
     def initEdit(self):
         layout = QVBoxLayout()
