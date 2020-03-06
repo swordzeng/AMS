@@ -51,7 +51,7 @@ class Ui_funcTradeAnalysis(object):
         df['Action'] = ''
         model = dfm.PandasModel(df)
         self.tableTrade.setModel(model)
-        dfm.FormatView(self.tableTrade, model.columnCount())
+        dfm.FormatView(self.tableTrade)
         dfm.addActionColumn(self.tableTrade, model, 'XXX', self.deleteSymbol)
         self.tableTrade.hideColumn(0)
         self.tableTrade.sortByColumn(0,0)

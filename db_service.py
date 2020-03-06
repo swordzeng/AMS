@@ -17,6 +17,14 @@ def table_delete(table, column, value):
     conn.commit()
     conn.close()
 
+def update_latest_date(table, setColumn, setValue, conColumn, conValue):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    sql = "update {} set {} = '{}' where {}='{}'".format(table, setColumn, setValue, conColumn, conValue)
+    cursor.execute(sql)
+    conn.commit()
+    conn.close()
+
 def get_latest_date(table, column='', value=''):
     conn = sqlite3.connect(DB_PATH)
 

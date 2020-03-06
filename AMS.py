@@ -9,7 +9,9 @@ from formFuncSystemMgt import Ui_funcSystemMgt
 from formFuncTradeEntry import Ui_funcTradeEntry
 from formFuncJobs import Ui_Jobs
 import cal_service as cal
+import db_service as db
 import threading
+import datetime
 import time
 
 class Ui_MainWindow(QMainWindow):
@@ -28,12 +30,12 @@ class Ui_MainWindow(QMainWindow):
         self.UI_FUNC_JOBS = "FUNCTION JOBS"
 
         #初始化页面
-        self.formReportSummary = initRptDailySummary()
         self.formReportHolding = initRptHolding()
-        self.formFuncTradeEntry = initFuncTradeEntry()
-        self.formFuncSystemMgt = initFuncSysMgt()
-        self.formFuncTradeAnalysis = initFuncTradeAnalysis()
-        self.formFuncJobs = initFuncJobs()
+        #self.formReportSummary = initRptDailySummary()
+        #self.formFuncTradeEntry = initFuncTradeEntry()
+        #self.formFuncSystemMgt = initFuncSysMgt()
+        #self.formFuncTradeAnalysis = initFuncTradeAnalysis()
+        #self.formFuncJobs = initFuncJobs()
 
         #MainWindow已经有默认layout，不能直接set layout，不然会报警告
         mainWidget = QWidget()
@@ -105,17 +107,23 @@ class Ui_MainWindow(QMainWindow):
 
     def changeUI(self,name):
         if name == self.UI_REPORT_SUMMARY:
-            form = self.formReportSummary
+            formReportSummary = initRptDailySummary()
+            form = formReportSummary
         if name == self.UI_REPORT_HOLDING:
-            form = self.formReportHolding
+            formReportHolding = initRptHolding()
+            form = formReportHolding
         if name == self.UI_FUNC_TRADE_ENTRY:
-            form = self.formFuncTradeEntry
+            formFuncTradeEntry = initFuncTradeEntry()
+            form = formFuncTradeEntry
         if name == self.UI_FUNC_TRADE_ANALYSIS:
-            form = self.formFuncTradeAnalysis
+            formFuncTradeAnalysis = initFuncTradeAnalysis()
+            form = formFuncTradeAnalysis
         if name == self.UI_FUNC_SYSTEM_MGT:
-            form = self.formFuncSystemMgt
+            formFuncSystemMgt = initFuncSysMgt()
+            form = formFuncSystemMgt
         if name == self.UI_FUNC_JOBS:
-            form = self.formFuncJobs
+            formFuncJobs = initFuncJobs()
+            form = formFuncJobs
 
         self.mainSplitter.widget(0).setParent(None)
         self.mainSplitter.insertWidget(0, form)
@@ -153,12 +161,21 @@ class initFuncTradeEntry(QWidget, Ui_funcTradeEntry):
         self.initUI(self)
 
 def initJobs(self):
-    #t = time.localtime(time.time())
-    #if t.tm_hour > 17:
-    cal.save_close_price()
-    time.sleep(60)
-    cal.save_exchange_rate()
-    print('Init jobs finished')
+    t_last_str = db.get_latest_date('Job_Info', 'JobName', 'save_close_price')
+    t_last = datetime.datetime.strptime(t_last_str, '%Y-%m-%d %H:%M:%S')
+    t_now = datetime.datetime.now()
+    t_now_str = t_now.strftime('%Y-%m-%d %H:%M:%S')
+    t_checkpoint_str = (t_now+datetime.timedelta(days=-1)).strftime('%Y-%m-%d') + ' 16:30:00'
+    t_checkpoint = datetime.datetime.strptime(t_checkpoint_str, '%Y-%m-%d %H:%M:%S')
+
+    if t_last < t_checkpoint:
+        cal.save_close_price()
+        time.sleep(60)
+        cal.save_exchange_rate()
+        db.update_latest_date('Job_Info', 'Date', t_now_str, 'JobName', 'save_close_price')
+        print('Init jobs finished')
+    else:
+        print('close price is update to date')
 
 if __name__ == '__main__':
     #字体大小自适应分辨率
