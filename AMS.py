@@ -173,9 +173,12 @@ def initJobs(self):
         time.sleep(60)
         cal.save_exchange_rate()
         db.update_latest_date('Job_Info', 'Date', t_now_str, 'JobName', 'save_close_price')
-        print('Init jobs finished')
     else:
         print('close price is update to date')
+
+    cal.cal_holding()
+    print('holding data is update to date')
+    print('Init jobs finished')
 
 if __name__ == '__main__':
     #字体大小自适应分辨率

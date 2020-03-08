@@ -186,34 +186,44 @@ def cal_holding(startDate='', endDate='' ):
 
         transBuy = trans.loc[(trans['OrderType'] == 'Buy') | (trans['OrderType'] == 'Bonus')]
         if transBuy.empty is False:
+            price = transBuy[['AccountID','SymbolCode','Price']].groupby(by=['AccountID','SymbolCode'], as_index=False).max()
+
             transBuy = transBuy.loc[:, ('AccountID','SymbolCode','SymbolName','Cur','Qty','SettleAmt')]
-            transBuy.rename(columns={'Qty':'QtyBuy'}, inplace=True)
+            transBuy.rename(columns={'Qty':'QtyBuy','SettleAmt':'SettleAmtBuy'}, inplace=True)
             transBuy = transBuy.groupby(['AccountID','SymbolCode','SymbolName','Cur']).sum()
             transBuy.insert(0,'Date',holdDate.strftime('%Y-%m-%d'))
-            transBuy['CostBuy'] = abs(transBuy['SettleAmt'])/transBuy['QtyBuy']
-            transBuy.drop(columns=['SettleAmt'],inplace=True)
+            transBuy['SettleAmtBuy'] = abs(transBuy['SettleAmtBuy'])
+            transBuy['CostBuy'] = transBuy['SettleAmtBuy']/transBuy['QtyBuy']
+            #transBuy.drop(columns=['SettleAmt'],inplace=True)
             transBuy.reset_index(inplace =True)
+
             hold = pd.merge(hold,transBuy,on=['Date','AccountID','SymbolCode','SymbolName','Cur'],how='outer')
+            hold = pd.merge(hold,price,on=['AccountID','SymbolCode'],how='left')
+
             hold.fillna(0, inplace=True)
         else:
             hold['QtyBuy'] = 0
             hold['CostBuy'] = 0  
+            hold['Price'] = 0
+            hold['SettleAmtBuy'] = 0
 
         transSell = trans.loc[trans['OrderType'] == 'Sell']
         if transSell.empty is False:
             transSell = transSell.loc[:, ('AccountID','SymbolCode','SymbolName','Cur','Qty','SettleAmt')]
-            transSell.rename(columns={'Qty':'QtySell'}, inplace=True)
+            transSell.rename(columns={'Qty':'QtySell','SettleAmt':'SettleAmtSell'}, inplace=True)
             transSell['QtySell'] = transSell.apply(lambda x: abs(x['QtySell']), axis=1 )
             transSell = transSell.groupby(['AccountID','SymbolCode','SymbolName','Cur']).sum()
             transSell.insert(0,'Date',holdDate.strftime('%Y-%m-%d'))
-            transSell['PriceSell'] = abs(transSell['SettleAmt'])/transSell['QtySell']
-            transSell.drop(columns=['SettleAmt'],inplace=True)
+            transSell['SettleAmtSell'] = abs(transSell['SettleAmtSell'])
+            transSell['PriceSell'] = transSell['SettleAmtSell']/transSell['QtySell']
+            #transSell.drop(columns=['SettleAmt'],inplace=True)
             transSell.reset_index(inplace =True)
             hold = pd.merge(hold,transSell,on=['Date','AccountID','SymbolCode','SymbolName','Cur'],how='outer')
             hold.fillna(0, inplace=True)
         else:
             hold['QtySell'] = 0
-            hold['PriceSell'] = 0       
+            hold['PriceSell'] = 0   
+            hold['SettleAmtSell'] = 0    
 
         transInterest = trans.loc[trans['OrderType'] == 'Interest']
         if transInterest.empty is False:
@@ -260,15 +270,31 @@ def cal_holding(startDate='', endDate='' ):
         hold['ExRate'] = hold['ExRate'].fillna(hold['ExRatePre'])
         hold['ExRate'] = hold.apply(lambda x: 1.0 if x['ExRate']==0 else x['ExRate'], axis=1 )
 
-        hold['Qty'] = hold.apply(lambda x: x['QtyPre']+x['MoneyIn']+x['MoneyOut']+x['DailyInterest'] \
+        #四舍五入过后计算的收益会有小数精度问题
+        #hold['CostBuy'] = hold.apply(lambda x: round(x['CostBuy'],3), axis=1)
+        #hold['PriceSell'] = hold.apply(lambda x: round(x['PriceSell'],3), axis=1)
+
+        moneySettle = hold.loc[:, ('AccountID','Cur','SettleAmtBuy','SettleAmtSell')]
+        moneySettle['SettleAmt'] = moneySettle.apply(lambda x: x['SettleAmtSell']-x['SettleAmtBuy'], axis=1)
+        moneySettle.drop(columns=['SettleAmtBuy','SettleAmtSell'],inplace=True)
+        moneySettle = moneySettle.groupby(['AccountID','Cur']).sum()
+        moneySettle.reset_index(inplace =True)
+        moneySettle.rename(columns={'Cur':'SymbolCode'}, inplace=True)
+        hold = pd.merge(hold,moneySettle, on=['AccountID','SymbolCode'],how='left')
+
+        hold['Qty'] = hold.apply(lambda x: x['QtyPre']+x['MoneyIn']+x['MoneyOut']+x['DailyInterest']+x['SettleAmt'] \
             if x['SymbolCode'] in ['HKD','CNY','USD'] else x['QtyPre']+x['QtyBuy']-x['QtySell'],axis=1)
         hold['Cost'] = hold.apply(lambda x: 0 if x['QtyPre']+x['QtyBuy']==0 \
             else (x['QtyPre']*x['CostPre'] + x['QtyBuy']*x['CostBuy']-x['DailyInterest'])/(x['QtyPre']+x['QtyBuy']),axis=1)
         hold['Cost'] = hold.apply(lambda x: 1.0 if x['SymbolCode'] in ['HKD','CNY','USD'] else x['Cost'], axis=1 )
+
+        hold['Qty'] = hold.apply(lambda x: round(x['Qty'],3), axis=1)
+        hold['Cost'] = hold.apply(lambda x: round(x['Cost'],3), axis=1)
+        
         #如果取到的收盘价为空，则取前日收盘价替代，前日收盘价仍为空，则用成本价替代
         hold['Close'] = hold['Close'].fillna(hold['ClosePre'])
-        hold['Close'] = hold.apply(lambda x: x['CostPre'] if x['Close']==0 else x['Close'], axis=1 )
-        hold['Close'] = hold.apply(lambda x: x['Cost'] if x['Close']==0 else x['Close'], axis=1 )
+        #hold['Close'] = hold.apply(lambda x: x['CostPre'] if x['Close']==0 else x['Close'], axis=1 )
+        hold['Close'] = hold.apply(lambda x: x['Price'] if x['Close']==0 else x['Close'], axis=1 )
 
         hold['MV'] = hold.apply(lambda x: x['Qty'] * x['Close'], axis=1 )
         hold['HoldingFloat'] = hold.apply(lambda x: x['Qty'] * (x['Close']-x['Cost']), axis=1 )
@@ -277,8 +303,6 @@ def cal_holding(startDate='', endDate='' ):
         hold['DailyFloat'] = hold.apply(lambda x: (x['QtyPre']-x['QtySell'])*(x['Close']-x['ClosePre']) + x['QtyBuy']*(x['Close']-x['CostBuy']) \
             if x['QtySell']<=x['QtyPre'] else (x['QtyBuy']+x['QtyPre']-x['QtySell'])*(x['Close']-x['CostBuy']), axis=1 )
 
-        hold['Qty'] = hold.apply(lambda x: round(x['Qty'],3), axis=1)
-        hold['Cost'] = hold.apply(lambda x: round(x['Cost'],3), axis=1)
         hold['MV'] = hold.apply(lambda x: round(x['MV'],2), axis=1)
         hold['HoldingFloat'] = hold.apply(lambda x: round(x['HoldingFloat'],2), axis=1)
         hold['DailyRealized'] = hold.apply(lambda x: round(x['DailyRealized'],2), axis=1)
@@ -288,9 +312,10 @@ def cal_holding(startDate='', endDate='' ):
         holdSymbol = hold[~hold['SymbolCode'].isin(['CNY','HKD','USD'])]
         holdSymbol = holdSymbol[~(holdSymbol['QtyBuy'].isin([0]) & holdSymbol['QtySell'].isin([0]) & holdSymbol['Qty'].isin([0]))]
         hold = pd.concat([holdCur,holdSymbol],ignore_index=True)
-        hold.drop(columns=['QtyPre','CostPre','ClosePre','ExRatePre'],inplace=True)
-
+        
         #pdb.set_trace()
+
+        hold.drop(columns=['QtyPre','CostPre','ClosePre','ExRatePre','Price','SettleAmtBuy','SettleAmtSell','SettleAmt'],inplace=True)
 
         db_service.table_delete('Holding_Table', 'Date', holdDate.strftime('%Y-%m-%d'))
         db_service.table_append(hold,'Holding_Table')
