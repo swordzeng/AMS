@@ -186,11 +186,13 @@ def cal_holding(startDate='', endDate='' ):
     else:
         endDate = endDate
 
-    t_last_str = db.get_latest_date('Job_Info', 'JobName', 'cal_holding')
+    t_last_str = db_service.get_latest_date('Job_Info', 'JobName', 'cal_holding')
     t_last = datetime.datetime.strptime(t_last_str, '%Y-%m-%d %H:%M:%S')
-    miniTransDate = db_service.get_trans_date(t_last)
 
-    
+    if db_service.get_trans_date(t_last) != '':
+        miniTransDate = datetime.datetime.strptime(db_service.get_trans_date(t_last), '%Y-%m-%d').date()
+        if miniTransDate < startDate:
+            startDate = miniTransDate
 
     holdDate = startDate
     while holdDate <= endDate:

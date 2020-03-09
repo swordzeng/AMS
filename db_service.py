@@ -65,6 +65,21 @@ def get_holding(acct='', dt=''):
 
     return dfHold
 
+def get_trans_date(inputTime):
+    conn = sqlite3.connect(DB_PATH)
+
+    query = """SELECT MIN(Order_Table.Date) AS miniDate FROM Order_Table 
+        INNER JOIN Account_Table 
+        ON Order_Table.AccountID = Account_Table.AccountID
+        WHERE Order_Table.InputTime >'{}' """.format(inputTime)
+
+    df_mini_date = pd.read_sql(query, con=conn)
+
+    miniDate = '' if df_mini_date.iat[0,0] == None else  df_mini_date.iat[0,0]
+
+    return miniDate
+
+
 def get_trans(acct='', dtStart='', dtEnd=''):
     if dtStart =='':
         dtStart = '2019-12-31'
