@@ -186,6 +186,12 @@ def cal_holding(startDate='', endDate='' ):
     else:
         endDate = endDate
 
+    t_last_str = db.get_latest_date('Job_Info', 'JobName', 'cal_holding')
+    t_last = datetime.datetime.strptime(t_last_str, '%Y-%m-%d %H:%M:%S')
+    miniTransDate = db_service.get_trans_date(t_last)
+
+    
+
     holdDate = startDate
     while holdDate <= endDate:
         print('################# cal holding @' + holdDate.strftime('%Y-%m-%d'))
@@ -195,8 +201,8 @@ def cal_holding(startDate='', endDate='' ):
         trans = db_service.get_trans(dtStart=preHoldDate.strftime('%Y-%m-%d'), dtEnd=holdDate.strftime('%Y-%m-%d'))
         trans.rename(columns={'CurTrade':'Cur'}, inplace=True)
 
-        hold = preHold.loc[:, ('AccountID','SymbolCode','SymbolName','Cur','Qty','Cost','Close','ExRate')]
-        hold.rename(columns={'Qty':'QtyPre', 'Cost':'CostPre','Close':'ClosePre','ExRate':'ExRatePre'}, inplace=True)
+        hold = preHold.loc[:, ('AccountID','SymbolCode','SymbolName','Cur','Qty','Cost','Close','ExRate','TotalPL')]
+        hold.rename(columns={'Qty':'QtyPre', 'Cost':'CostPre','Close':'ClosePre','ExRate':'ExRatePre','TotalPL':'TotalPLPre'}, inplace=True)
         hold.insert(0,'Date',holdDate.strftime('%Y-%m-%d'))
 
         transBuy = trans.loc[(trans['OrderType'] == 'Buy') | (trans['OrderType'] == 'Bonus')]
@@ -322,6 +328,7 @@ def cal_holding(startDate='', endDate='' ):
         hold['HoldingFloat'] = hold.apply(lambda x: round(x['HoldingFloat'],2), axis=1)
         hold['DailyRealized'] = hold.apply(lambda x: round(x['DailyRealized'],2), axis=1)
         hold['DailyFloat'] = hold.apply(lambda x: round(x['DailyFloat'],2), axis=1)
+        hold['TotalPL'] = hold.apply(lambda x: round((x['TotalPLPre']+x['DailyFloat']+x['DailyRealized']+x['DailyInterest']),2), axis=1)
 
         holdCur = hold[hold['SymbolCode'].isin(['CNY','HKD','USD'])]
         holdSymbol = hold[~hold['SymbolCode'].isin(['CNY','HKD','USD'])]
@@ -330,7 +337,7 @@ def cal_holding(startDate='', endDate='' ):
         
         #pdb.set_trace()
 
-        hold.drop(columns=['QtyPre','CostPre','ClosePre','ExRatePre','Price','SettleAmtBuy','SettleAmtSell','SettleAmt'],inplace=True)
+        hold.drop(columns=['QtyPre','CostPre','ClosePre','ExRatePre','Price','SettleAmtBuy','SettleAmtSell','SettleAmt','TotalPLPre'],inplace=True)
 
         db_service.table_delete('Holding_Table', 'Date', holdDate.strftime('%Y-%m-%d'))
         db_service.table_append(hold,'Holding_Table')

@@ -13,7 +13,7 @@ import datetime
 class Ui_funcTradeEntry(object):
     def initUI(self, Ui_funcTradeEntry):
 
-        self.acctList = ('CITIC','CMS','HUATAI','FUTU')
+        self.acctList = ('CITIC','CMS','HUATAI','FUTU','LM')
 
         self.mainLayout = QVBoxLayout()
         self.setLayout(self.mainLayout)
