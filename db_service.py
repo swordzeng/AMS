@@ -113,9 +113,10 @@ def get_history_price(symbol='',dtStart='',dtEnd='', type='equity'):
 
     return closePrice
 
-def get_symbol_for_close_price():
+def get_symbol_for_close_price(dtStart=''):
     dfHold = get_holding()
-    dtStart = get_latest_date("Holding_Table")
+    if dtStart=='':
+        dtStart = get_latest_date("Holding_Table")
     dfTrans = get_trans(dtStart=dtStart)
     listHold = list(dfHold['SymbolCode'])
     listTrans = list(dfTrans['SymbolCode'])

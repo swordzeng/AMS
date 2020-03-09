@@ -80,9 +80,9 @@ def get_exchange_rate(cur):
     
     return exRate
 
-def save_close_price(symbol=''):
+def save_close_price(symbol='', dtStart=''):
     if symbol=='':
-        symbolList = db_service.get_symbol_for_close_price()
+        symbolList = db_service.get_symbol_for_close_price(dtStart)
     elif type(symbol) is str:
         symbolList = []
         symbolList.append(symbol)
@@ -105,11 +105,18 @@ def save_close_price(symbol=''):
 
             maxDate = db_service.get_latest_date('Close_Price','SymbolCode',code)
             maxDate = '2019-12-30' if maxDate == '2019-12-31' else maxDate
+            now = datetime.datetime.now()
+            nowDate = now.strftime('%Y-%m-%d')
+            nowTime = now.strftime('%H:%M:%S')
             #maxDate2 = datetime.datetime.strptime(maxDate, '%Y-%m-%d')
             #date = get_weekday(datetime.datetime.now().strftime('%Y-%m-%d'),'pre')
             #if date > maxDate2:
             dfClose = get_close_price(code)
             dfClose = dfClose.loc[dfClose["Date"] > maxDate]
+            if nowTime < '16:30:00':
+                dfClose = dfClose.loc[dfClose["Date"] < nowDate]
+                nowDate = (datetime.datetime.now()+datetime.timedelta(days=-1)).strftime('%Y-%m-%d')
+
             db_service.table_append(dfClose,'Close_Price')
 
         except Exception as e:
@@ -117,20 +124,28 @@ def save_close_price(symbol=''):
             print(repr(e))
             #traceback.print_exc()
         else:
-            print('Close price of Symbol : {} successful!'.format(code))
+            print('Close price of Symbol : {}, date: {} successful!'.format(code, nowDate))
 
 def save_exchange_rate(symbol=['HKD','USD']):
     for code in symbol:
         try:
             maxDate = db_service.get_latest_date('Exchange_Rate','SymbolCode',code)
             maxDate = '2019-12-30' if maxDate == '2019-12-31' else maxDate
+            now = datetime.datetime.now()
+            nowDate = now.strftime('%Y-%m-%d')
+            nowTime = now.strftime('%H:%M:%S')
+
             dfClose = get_exchange_rate(code)
             dfClose = dfClose.loc[dfClose["Date"] > maxDate]
+            if nowTime < '16:30:00':
+                dfClose = dfClose.loc[dfClose["Date"] < nowDate]
+                nowDate = (datetime.datetime.now()+datetime.timedelta(days=-1)).strftime('%Y-%m-%d')
+
             db_service.table_append(dfClose,'Exchange_Rate')
         except Exception as e:
             traceback.print_exc()
         else:
-            print('Close price of Symbol : {} successful!'.format(code))
+            print('Close price of Symbol : {}, date: {} successful!'.format(code, nowDate))
 
 def cal_holding(startDate='', endDate='' ):
 
@@ -289,7 +304,7 @@ def cal_holding(startDate='', endDate='' ):
         hold['Cost'] = hold.apply(lambda x: 1.0 if x['SymbolCode'] in ['HKD','CNY','USD'] else x['Cost'], axis=1 )
 
         hold['Qty'] = hold.apply(lambda x: round(x['Qty'],3), axis=1)
-        hold['Cost'] = hold.apply(lambda x: round(x['Cost'],3), axis=1)
+        #hold['Cost'] = hold.apply(lambda x: round(x['Cost'],3), axis=1)
         
         #如果取到的收盘价为空，则取前日收盘价替代，前日收盘价仍为空，则用成本价替代
         hold['Close'] = hold['Close'].fillna(hold['ClosePre'])
