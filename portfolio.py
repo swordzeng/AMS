@@ -4,6 +4,7 @@ import pandas as pd
 import re
 import json
 import urllib.request
+import pdb
 
 def cal_daily_hold(dt, acct):
     pass
@@ -59,6 +60,7 @@ def get_hold(dt, account, region='ALL'):
     df_cur_sum.index.name = 'SymbolCode'
     df_cur_sum['CostAmt'] = df_cur_sum['Qty']
 
+    #pdb.set_trace()
     #合并股票持仓和现金持仓
     df_hold = df_stock_sum.append(df_cur_sum)
     df_hold = df_hold[~df_hold['Qty'].isin([0])]    #去除报告日持仓为0的标的

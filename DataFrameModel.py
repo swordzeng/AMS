@@ -99,7 +99,7 @@ def FormatView(view,columnCount=0):
     view.setSortingEnabled(True)
     view.verticalHeader().setHidden(True)
     #水平方向，表格大小拓展到适当的尺寸      
-    #view.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+    view.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
     if columnCount != 0:
         view.horizontalHeader().setSectionResizeMode(columnCount-1, QtWidgets.QHeaderView.Stretch)
     view.resizeColumnsToContents()
