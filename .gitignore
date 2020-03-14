@@ -1,0 +1,11 @@
+__pycache__/cal_service.cpython-37.pyc
+__pycache__/DataFrameModel.cpython-37.pyc
+__pycache__/db_service.cpython-37.pyc
+__pycache__/formFuncJobs.cpython-37.pyc
+__pycache__/formFuncSystemMgt.cpython-37.pyc
+__pycache__/formFuncTradeAnalysis.cpython-37.pyc
+__pycache__/formFuncTradeEntry.cpython-37.pyc
+__pycache__/formRptDailySummary.cpython-37.pyc
+__pycache__/formRptHolding.cpython-37.pyc
+__pycache__/getData.cpython-37.pyc
+__pycache__/portfolio.cpython-37.pyc

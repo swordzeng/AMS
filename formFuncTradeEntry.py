@@ -27,7 +27,7 @@ class Ui_funcTradeEntry(object):
         self.Symbol = getData.MySymbol('')
 
         self.initEdit()
-        self.fill_data()
+        #self.fill_data()
 
     def fill_data(self):
         dateStart = self.StartDate.date().toString('yyyy-MM-dd')
