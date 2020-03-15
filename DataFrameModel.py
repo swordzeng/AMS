@@ -100,8 +100,9 @@ def FormatView(view,columnCount=0):
     view.verticalHeader().setHidden(True)
     #水平方向，表格大小拓展到适当的尺寸      
     view.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
-    if columnCount != 0:
-        view.horizontalHeader().setSectionResizeMode(columnCount-1, QtWidgets.QHeaderView.Stretch)
+    view.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+    #if columnCount != 0:
+        #view.horizontalHeader().setSectionResizeMode(columnCount-1, QtWidgets.QHeaderView.Stretch)
     view.resizeColumnsToContents()
     view.setAlternatingRowColors(True)
     view.horizontalHeader().setStyleSheet("QHeaderView::section {background-color:lightblue;color: black;padding-left: 4px;border: 1px solid #6c6c6c;font: bold;}")
@@ -118,7 +119,7 @@ def addActionColumn(tableView, model, tableName, func):
         btnDelete = QtWidgets.QPushButton('')
         btnDelete.setIcon(iconDelete)
         btnDelete.clicked.connect(lambda:func(model))
-        SymbolCode = model.itemData(model.index(row,0))[0]  #返回dict类型
+        #SymbolCode = model.itemData(model.index(row,0))[0]  #返回dict类型
         btnDelete.setProperty("row", row)    
         tableView.setIndexWidget(model.index(row,columnPos), btnDelete) 
 
@@ -144,7 +145,7 @@ def load_table(tableView, model, df):
             if type(itemValue).__name__ == 'float64':
                 itemValue = float(itemValue)
                 if itemValue < 0:
-                    item.setForeground(QBrush(QColor(255, 0, 0)))
+                    item.setForeground(QtGui.QBrush(QtGui.QColor(255, 0, 0)))
                 itemValue = '{:.2f}'.format(itemValue)
             
             '''
