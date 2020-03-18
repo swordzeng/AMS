@@ -1,28 +1,27 @@
 # -*- coding: utf-8 -*-
 
-import sys 
+# import sys
 import sqlite3
 import pandas as pd
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5 import QtCore, QtWidgets, QtGui
 import getData
 import DataFrameModel as dfm
+
 
 class Ui_funcSystemMgt(object):
     def initUI(self, Ui_funcSystemMgt):
 
         self.db = sqlite3.connect('AMS.db')
-        self.tableView = QTableView()
+        self.tableView = QtWidgets.QTableView()
 
-        mainLayout = QVBoxLayout()
+        mainLayout = QtWidgets.QVBoxLayout()
         self.setLayout(mainLayout)
 
-        tabWidget = QTabWidget()
+        tabWidget = QtWidgets.QTabWidget()
         mainLayout.addWidget(tabWidget)
 
-        self.tabSymbol = QWidget()
-        self.tabAcct = QWidget()
+        self.tabSymbol = QtWidgets.QWidget()
+        self.tabAcct = QtWidgets.QWidget()
 
         tabWidget.addTab(self.tabSymbol, "Symbol Management")
         tabWidget.addTab(self.tabAcct, " Account Management")
@@ -31,89 +30,89 @@ class Ui_funcSystemMgt(object):
         self.tabAcctUI()
 
     def tabSymbolUI(self):
-        layout = QVBoxLayout()
+        layout = QtWidgets.QVBoxLayout()
         self.tabSymbol.setLayout(layout)
 
-        labelSymbolCode = QLabel('Symbol Code')
-        labelSymbolName = QLabel('Symbol Name')
-        labelUnderly = QLabel('Underlying')
-        labelAsset = QLabel('Asset Class')
-        labelMarket = QLabel('Exchange')
-        labelCur = QLabel('Currency')
-        labelMultiplier = QLabel('Multiplier')
-        labelCommission = QLabel('Commission')
-        labelSector = QLabel('Sector')
-        labelRegion = QLabel('Region')
+        labelSymbolCode = QtWidgets.QLabel('Symbol Code')
+        labelSymbolName = QtWidgets.QLabel('Symbol Name')
+        labelUnderly = QtWidgets.QLabel('Underlying')
+        labelAsset = QtWidgets.QLabel('Asset Class')
+        labelMarket = QtWidgets.QLabel('Exchange')
+        labelCur = QtWidgets.QLabel('Currency')
+        labelMultiplier = QtWidgets.QLabel('Multiplier')
+        labelCommission = QtWidgets.QLabel('Commission')
+        labelSector = QtWidgets.QLabel('Sector')
+        labelRegion = QtWidgets.QLabel('Region')
 
-        self.editSymbolCode = QLineEdit()
-        self.editSymbolName = QLineEdit()
-        self.editUnderly = QComboBox()
-        self.editAsset = QComboBox()
-        self.editMarket = QComboBox()
-        self.editCur = QComboBox()
-        self.editMultiplier = QLineEdit('1')
-        self.editCommission = QLineEdit('0')
-        self.editSector = QComboBox()
-        self.editRegion = QComboBox()
+        self.editSymbolCode = QtWidgets.QLineEdit()
+        self.editSymbolName = QtWidgets.QLineEdit()
+        self.editUnderly = QtWidgets.QComboBox()
+        self.editAsset = QtWidgets.QComboBox()
+        self.editMarket = QtWidgets.QComboBox()
+        self.editCur = QtWidgets.QComboBox()
+        self.editMultiplier = QtWidgets.QLineEdit('1')
+        self.editCommission = QtWidgets.QLineEdit('0')
+        self.editSector = QtWidgets.QComboBox()
+        self.editRegion = QtWidgets.QComboBox()
 
-        self.editUnderly.addItems(['','MHI','MCH'])
-        self.editAsset.addItems(['EQUITY','BOND','DERIVATIVES','CASH'])
-        self.editMarket.addItems(['','SSE','SZSE','HKEX'])
-        self.editCur.addItems(['CNY','HKD','USD'])
-        self.editRegion.addItems(['','CN','HK'])
+        self.editUnderly.addItems(['', 'MHI', 'MCH'])
+        self.editAsset.addItems(['EQUITY', 'BOND', 'DERIVATIVES', 'CASH'])
+        self.editMarket.addItems(['', 'SSE', 'SZSE', 'HKEX'])
+        self.editCur.addItems(['CNY', 'HKD', 'USD'])
+        self.editRegion.addItems(['', 'CN', 'HK'])
 
         self.editSector.setEditable(True)
-        codeList = getData.get_list('Symbol_Table','Sector')
-        codeList.insert(0,'')
+        codeList = getData.get_list('Symbol_Table', 'Sector')
+        codeList.insert(0, '')
         codeList = [str(i) for i in codeList]
         self.editSector.addItems(codeList)
 
-        #layoutInput = QHBoxLayout()
-        gridInput = QGridLayout()
-        gridInput.addWidget(labelSymbolCode,0,0)
-        gridInput.addWidget(self.editSymbolCode,0,1)
-        gridInput.addWidget(labelSymbolName,1,0)
-        gridInput.addWidget(self.editSymbolName,1,1)
-        gridInput.addWidget(labelUnderly,0,2)
-        gridInput.addWidget(self.editUnderly,0,3)
-        gridInput.addWidget(labelAsset,1,2)
-        gridInput.addWidget(self.editAsset,1,3)
-        gridInput.addWidget(labelMarket,0,4)
-        gridInput.addWidget(self.editMarket,0,5)
-        gridInput.addWidget(labelCur,1,4)
-        gridInput.addWidget(self.editCur,1,5)
-        gridInput.addWidget(labelMultiplier,0,6)
-        gridInput.addWidget(self.editMultiplier,0,7)
-        gridInput.addWidget(labelCommission,1,6)
-        gridInput.addWidget(self.editCommission,1,7)
-        gridInput.addWidget(labelSector,0,8)
-        gridInput.addWidget(self.editSector,0,9)
-        gridInput.addWidget(labelRegion,1,8)
-        gridInput.addWidget(self.editRegion,1,9)
+        # layoutInput = QHBoxLayout()
+        gridInput = QtWidgets.QGridLayout()
+        gridInput.addWidget(labelSymbolCode, 0, 0)
+        gridInput.addWidget(self.editSymbolCode, 0, 1)
+        gridInput.addWidget(labelSymbolName, 1, 0)
+        gridInput.addWidget(self.editSymbolName, 1, 1)
+        gridInput.addWidget(labelUnderly, 0, 2)
+        gridInput.addWidget(self.editUnderly, 0, 3)
+        gridInput.addWidget(labelAsset, 1, 2)
+        gridInput.addWidget(self.editAsset, 1, 3)
+        gridInput.addWidget(labelMarket, 0, 4)
+        gridInput.addWidget(self.editMarket, 0, 5)
+        gridInput.addWidget(labelCur, 1, 4)
+        gridInput.addWidget(self.editCur, 1, 5)
+        gridInput.addWidget(labelMultiplier, 0, 6)
+        gridInput.addWidget(self.editMultiplier, 0, 7)
+        gridInput.addWidget(labelCommission, 1, 6)
+        gridInput.addWidget(self.editCommission, 1, 7)
+        gridInput.addWidget(labelSector, 0, 8)
+        gridInput.addWidget(self.editSector, 0, 9)
+        gridInput.addWidget(labelRegion, 1, 8)
+        gridInput.addWidget(self.editRegion, 1, 9)
 
-        btnClear = QPushButton('Clear')
+        btnClear = QtWidgets.QPushButton('Clear')
         btnClear.clicked.connect(self.clearSymbol)
-        gridInput.addWidget(btnClear,0,10)
+        gridInput.addWidget(btnClear, 0, 10)
 
-        btnAdd = QPushButton('Insert')
+        btnAdd = QtWidgets.QPushButton('Insert')
         btnAdd.clicked.connect(self.insertSymbol)
-        gridInput.addWidget(btnAdd,1,10)
+        gridInput.addWidget(btnAdd, 1, 10)
 
-        gridInput.setColumnStretch(0,2)
-        gridInput.setColumnStretch(1,3)
-        gridInput.setColumnStretch(2,2)
-        gridInput.setColumnStretch(3,3)
-        gridInput.setColumnStretch(4,2)
-        gridInput.setColumnStretch(5,3)
-        gridInput.setColumnStretch(6,2)
-        gridInput.setColumnStretch(7,3)
-        gridInput.setColumnStretch(8,2)
-        gridInput.setColumnStretch(9,3)
-        gridInput.setColumnStretch(10,3)
-        
+        gridInput.setColumnStretch(0, 2)
+        gridInput.setColumnStretch(1, 3)
+        gridInput.setColumnStretch(2, 2)
+        gridInput.setColumnStretch(3, 3)
+        gridInput.setColumnStretch(4, 2)
+        gridInput.setColumnStretch(5, 3)
+        gridInput.setColumnStretch(6, 2)
+        gridInput.setColumnStretch(7, 3)
+        gridInput.setColumnStretch(8, 2)
+        gridInput.setColumnStretch(9, 3)
+        gridInput.setColumnStretch(10, 3)
+
         gridInput.setVerticalSpacing(3)
 
-        widgetInput = QWidget()
+        widgetInput = QtWidgets.QWidget()
         widgetInput.setLayout(gridInput)
         widgetInput.setStyleSheet('''
             QWidget{border: 1px solid gray;}
@@ -130,25 +129,25 @@ class Ui_funcSystemMgt(object):
     def fill_data(self):
         strTable = "Symbol_Table"
         query = "SELECT * FROM Symbol_Table ORDER BY AssetClass, Region, Exchange, SymbolCode"
-        model = QStandardItemModel()
-        df = pd.read_sql(query, con = self.db)
+        model = QtGui.QStandardItemModel()
+        df = pd.read_sql(query, con=self.db)
         dfm.load_table(self.tableView, model, df)
         self.addActionColumn(self.tableView, model, strTable)
-        self.tableView.sortByColumn(2, Qt.DescendingOrder)
+        self.tableView.sortByColumn(2, QtCore.Qt.DescendingOrder)
 
     def tabAcctUI(self):
-        layout = QFormLayout()
-        sex = QHBoxLayout()
-        sex.addWidget(QRadioButton("男"))
-        sex.addWidget(QRadioButton("女"))
-        layout.addRow(QLabel("性别"), sex)
-        layout.addRow("生日", QLineEdit())
+        layout = QtWidgets.QFormLayout()
+        sex = QtWidgets.QHBoxLayout()
+        sex.addWidget(QtWidgets.QRadioButton("男"))
+        sex.addWidget(QtWidgets.QRadioButton("女"))
+        layout.addRow(QtWidgets.QLabel("性别"), sex)
+        layout.addRow("生日", QtWidgets.QLineEdit())
         self.tabAcct.setLayout(layout)
 
     def insertSymbol(self):
         if self.editSymbolCode.text().strip() != '':
             query = "SELECT * FROM Symbol_Table WHERE SymbolCode = '" + self.editSymbolCode.text().strip() + "'"
-            df = pd.read_sql(query, con = self.db)
+            df = pd.read_sql(query, con=self.db)
 
             if df.empty:
                 dictSymbol = {}
@@ -165,15 +164,15 @@ class Ui_funcSystemMgt(object):
                 dictSymbol['Region'] = self.editRegion.currentText().strip()
                 getData.insert_record('Symbol_Table', dictSymbol)
                 self.fill_data()
-                QMessageBox.information(self, 'info', 'Symbol created!', QMessageBox.Close)
+                QtWidgets.QMessageBox.information(self, 'info', 'Symbol created!', QtWidgets.QMessageBox.Close)
             else:
-                QMessageBox.warning(self, 'warning', 'Symbol already exists!', QMessageBox.Close)
+                QtWidgets.QMessageBox.warning(self, 'warning', 'Symbol already exists!', QtWidgets.QMessageBox.Close)
 
-    def copySymbol(self,table):
+    def copySymbol(self, table):
         code = self.sender()
         symbolCode = str(code.property('code'))
         symbol = getData.MySymbol(symbolCode)
-        
+
         self.editSymbolCode.setText(symbol.Code)
         self.editSymbolName.setText(symbol.Name)
         self.editMarket.setCurrentText(symbol.Exchange)
@@ -185,7 +184,7 @@ class Ui_funcSystemMgt(object):
         self.editSector.setCurrentText(symbol.Sector)
         self.editRegion.setCurrentText(symbol.Region)
 
-    def clearSymbol(self,table):
+    def clearSymbol(self, table):
         self.editSymbolCode.setText('')
         self.editSymbolName.setText('')
         self.editMarket.setCurrentText('')
@@ -197,11 +196,12 @@ class Ui_funcSystemMgt(object):
         self.editSector.setCurrentText('')
         self.editRegion.setCurrentText('')
 
-    def deleteSymbol(self,table):
+    def deleteSymbol(self, table):
         btn = self.sender()
         symbol = str(btn.property('code'))
-        reply = QMessageBox.question(self, 'Delete', 'Sure to delete symbol :' + symbol + '?', QMessageBox.Yes | QMessageBox.No)
-        if reply == QMessageBox.Yes:
+        reply = QtWidgets.QMessageBox.question(self, 'Delete', 'Sure to delete symbol :' + symbol + '?',
+                                               QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        if reply == QtWidgets.QMessageBox.Yes:
             query = "DELETE FROM " + table + " WHERE SymbolCode = '" + symbol + "'"
             print(query)
             cursor = self.db.cursor()
@@ -217,23 +217,23 @@ class Ui_funcSystemMgt(object):
 
         rowCount = model.rowCount()
         for row in range(rowCount):
-            symbolCode = model.itemData(model.index(row,0))[0]  #返回dict类型
+            symbolCode = model.itemData(model.index(row, 0))[0]  # 返回dict类型
 
-            hlayout = QHBoxLayout()
-            groupAction = QGroupBox()
+            hlayout = QtWidgets.QHBoxLayout()
+            groupAction = QtWidgets.QGroupBox()
 
-            iconDelete = QIcon()
+            iconDelete = QtGui.QIcon()
             iconDelete.addFile('logo/delete1.png')
-            btnDelete = QPushButton('')
+            btnDelete = QtWidgets.QPushButton('')
             btnDelete.setIcon(iconDelete)
-            btnDelete.clicked.connect(lambda:self.deleteSymbol(tableName))
+            btnDelete.clicked.connect(lambda: self.deleteSymbol(tableName))
             btnDelete.setProperty("code", symbolCode)
 
-            iconCopy = QIcon()
+            iconCopy = QtGui.QIcon()
             iconCopy.addFile('logo/edit1.png')
-            btnCopy = QPushButton('')
+            btnCopy = QtWidgets.QPushButton('')
             btnCopy.setIcon(iconCopy)
-            btnCopy.clicked.connect(lambda:self.copySymbol(tableName))
+            btnCopy.clicked.connect(lambda: self.copySymbol(tableName))
             btnCopy.setProperty("code", symbolCode)
 
             hlayout.addWidget(btnDelete)
@@ -245,4 +245,4 @@ class Ui_funcSystemMgt(object):
             btnCopy.setFixedHeight(30)
             groupAction.setLayout(hlayout)
 
-            tableView.setIndexWidget(model.index(row,columnPos), groupAction)           
+            tableView.setIndexWidget(model.index(row, columnPos), groupAction)

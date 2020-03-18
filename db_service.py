@@ -4,10 +4,12 @@ import datetime
 
 DB_PATH = 'AMS.db'
 
+
 def table_append(df, table):
     conn = sqlite3.connect(DB_PATH)
     df.to_sql(table, con=conn, if_exists='append', index=False)
     conn.close()
+
 
 def table_delete(table, column, value):
     conn = sqlite3.connect(DB_PATH)
@@ -17,6 +19,7 @@ def table_delete(table, column, value):
     conn.commit()
     conn.close()
 
+
 def update_latest_date(table, setColumn, setValue, conColumn, conValue):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
@@ -25,27 +28,29 @@ def update_latest_date(table, setColumn, setValue, conColumn, conValue):
     conn.commit()
     conn.close()
 
+
 def get_latest_date(table, column='', value=''):
     conn = sqlite3.connect(DB_PATH)
 
     query = "SELECT MAX(Date) AS Max_Date FROM {} ".format(table)
-    if column=='' or value=='':
-        condition = ''  
+    if column == '' or value == '':
+        condition = ''
     else:
         condition = " WHERE {} = '{}'".format(column, value)
 
     df_max_date = pd.read_sql(query+condition, con=conn)
     conn.close()
 
-    max_date = '2019-12-31' if df_max_date.iat[0,0] == None else  df_max_date.iat[0,0]
+    max_date = '2019-12-31' if df_max_date.iat[0, 0] is None else df_max_date.iat[0, 0]
 
     return max_date
+
 
 def get_holding(acct='', dt=''):
 
     table = 'Holding_Table'
 
-    if acct=='':
+    if acct == '':
         acctCondition = ''
     elif type(acct) is str:
         acctCondition = " AND AccountID = '{}' ".format(acct)
@@ -65,79 +70,82 @@ def get_holding(acct='', dt=''):
 
     return dfHold
 
+
 def get_trans_date(inputTime):
     conn = sqlite3.connect(DB_PATH)
 
-    query = """SELECT MIN(Order_Table.Date) AS miniDate FROM Order_Table 
-        INNER JOIN Account_Table 
+    query = """SELECT MIN(Order_Table.Date) AS miniDate FROM Order_Table
+        INNER JOIN Account_Table
         ON Order_Table.AccountID = Account_Table.AccountID
         WHERE Order_Table.InputTime >'{}' """.format(inputTime)
 
     df_mini_date = pd.read_sql(query, con=conn)
 
-    miniDate = '' if df_mini_date.iat[0,0] == None else  df_mini_date.iat[0,0]
+    miniDate = '' if df_mini_date.iat[0, 0] is None else df_mini_date.iat[0, 0]
 
     return miniDate
 
 
 def get_trans(acct='', dtStart='', dtEnd=''):
-    if dtStart =='':
+    if dtStart == '':
         dtStart = '2019-12-31'
 
-    if dtEnd =='':
+    if dtEnd == '':
         dtEnd = datetime.datetime.now().strftime('%Y-%m-%d')
 
-    query = """SELECT Order_Table.* FROM Order_Table 
-        INNER JOIN Account_Table 
+    query = """SELECT Order_Table.* FROM Order_Table
+        INNER JOIN Account_Table
         ON Order_Table.AccountID = Account_Table.AccountID
         WHERE Date >'{}' and Date <='{}' """.format(dtStart, dtEnd)
 
     conn = sqlite3.connect(DB_PATH)
-    df_trans = pd.read_sql(query, con = conn)
+    df_trans = pd.read_sql(query, con=conn)
 
     return df_trans
 
-def get_history_price(symbol='',dtStart='',dtEnd='', type='equity'):
+
+def get_history_price(symbol='', dtStart='', dtEnd='', type='equity'):
 
     dtStart = '2019-12-31' if dtStart == '' else dtStart
-    dtEnd = datetime.datetime.strptime(date, '%Y-%m-%d') if dtEnd =='' else dtEnd
+    dtEnd = datetime.datetime.now().strftime('%Y-%m-%d') if dtEnd == '' else dtEnd
 
     '''
     if type(dtStart) is str:
-        dtStart = dtStart 
+        dtStart = dtStart
     else:
         dtStart = dtStart.strftime('%Y-%m-%d')
 
     dateEnd = dtEnd if type(dtEnd) is str else dtEnd.strftime('%Y-%m-%d')
     '''
-    
-    if symbol=='':
+
+    if symbol == '':
         symbolCondition = ''
     elif type(symbol) is str:
         symbolCondition = " AND SymbolCode = '{}' ".format(symbol)
     else:
         symbolCondition = " AND SymbolCode in {} ".format(str(tuple(symbol)))
 
-    table =  'Close_Price' if type == 'equity' else 'Exchange_Rate'
+    table = 'Close_Price' if type == 'equity' else 'Exchange_Rate'
 
     query = """SELECT * FROM {}
         WHERE Date >'{}' and Date <='{}' """.format(table, dtStart, dtEnd) + symbolCondition
 
     conn = sqlite3.connect(DB_PATH)
-    closePrice = pd.read_sql(query, con = conn)
+    closePrice = pd.read_sql(query, con=conn)
 
     return closePrice
 
+
 def get_symbol_for_close_price(dtStart=''):
     dfHold = get_holding()
-    if dtStart=='':
+    if dtStart == '':
         dtStart = get_latest_date("Holding_Table")
     dfTrans = get_trans(dtStart=dtStart)
     listHold = list(dfHold['SymbolCode'])
     listTrans = list(dfTrans['SymbolCode'])
     listHold.extend(listTrans)
-    listSymbol = list(set(listHold))  #去重
-    for cur in ['CNY','HKD','USD']:
+    listSymbol = list(set(listHold))  # 去重
+    for cur in ['CNY', 'HKD', 'USD']:
         if cur in listSymbol:
             listSymbol.remove(cur)
 

@@ -1,17 +1,17 @@
-import sys 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtWidgets
+
 
 class Ui_Second(object):
     def initUI(self, Ui_Second):
         mainLayout = QtWidgets.QVBoxLayout()
-        #self.verticalLayoutR.setSpacing(0)
+        # self.verticalLayoutR.setSpacing(0)
         Frame = QtWidgets.QFrame()
         Frame.setStyleSheet('''
             QFrame{border-style:solid;border-width:2;border-color:red;}
             QLabel{border-style:none;}
             ''')
-        #self.exitFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        #self.exitFrame.setFrameShadow(QtWidgets.QFrame.Raised)
+        # self.exitFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        # self.exitFrame.setFrameShadow(QtWidgets.QFrame.Raised)
         frameLayout = QtWidgets.QVBoxLayout(Frame)
         exitBtn = QtWidgets.QPushButton("Exit")
         label = QtWidgets.QLabel('This is 222')
@@ -31,5 +31,5 @@ class Ui_Second(object):
         frameLayout.addWidget(label33)
 
         mainLayout.addWidget(Frame)
-        mainLayout.setContentsMargins(0,0,0,0)
+        mainLayout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(mainLayout)

@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
- 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+
+from PyQt5 import QtCore, QtWidgets, QtGui
 import pandas as pd
 import sqlite3
 import datetime
 
+
 class Ui_Jobs(object):
     def initUI(self, Ui_Jobs):
-        self.mainLayout = QVBoxLayout()
+        self.mainLayout = QtWidgets.QVBoxLayout()
         self.setLayout(self.mainLayout)
 
         self.initHoldingCal()
@@ -26,9 +25,9 @@ class Ui_Jobs(object):
     def max_holding(self):
         db = sqlite3.connect('AMS.db')
         query = "select max(Date) as 'Date' from Holding_Table"
-        df = pd.read_sql(query, con = db)
-        dayMax = datetime.datetime.strptime(df.loc[0,'Date'], "%Y-%m-%d").date()
-        
+        df = pd.read_sql(query, con=db)
+        dayMax = datetime.datetime.strptime(df.loc[0, 'Date'], "%Y-%m-%d").date()
+
         return dayMax
 
     def check_status(self):
@@ -36,40 +35,40 @@ class Ui_Jobs(object):
         strStatus = 'Max Holding Date: ' + datetime.datetime.strftime(dayMax, '%Y-%m-%d')
         self.HoldingStatus.setText(strStatus)
 
-        timeDelta = (QDate.currentDate().toPyDate() - dayMax).days
+        timeDelta = (QtCore.QDate.currentDate().toPyDate() - dayMax).days
         if timeDelta > 1:
             self.HoldingStatus.setStyleSheet("color:red;")
         else:
             self.HoldingStatus.setStyleSheet("color:black;")
 
     def initHoldingCal(self):
-        groupHolding = QGroupBox()
-        groupHoldingLayout = QVBoxLayout()
+        groupHolding = QtWidgets.QGroupBox()
+        groupHoldingLayout = QtWidgets.QVBoxLayout()
         groupHolding.setLayout(groupHoldingLayout)
 
-        layoutHoldingTitle = QHBoxLayout()
-        labelHoldingTitle = QLabel('Holding Calculation')
-        labelHoldingTitle.setFont(QFont("Timers", 14, QFont.Bold))
+        layoutHoldingTitle = QtWidgets.QHBoxLayout()
+        labelHoldingTitle = QtWidgets.QLabel('Holding Calculation')
+        labelHoldingTitle.setFont(QtGui.QFont("Timers", 14, QtGui.QFont.Bold))
         labelHoldingTitle.setStyleSheet("border: 1px solid gray; background-color: white")
-        labelHoldingTitle.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
+        labelHoldingTitle.setAlignment(QtCore.Qt.AlignVCenter | QtCore.Qt.AlignHCenter)
         layoutHoldingTitle.addWidget(labelHoldingTitle)
 
         dayMax = self.max_holding()
         dayStart = dayMax + datetime.timedelta(days=1)
 
-        labelStart = QLabel("Date Start")
-        labelEnd = QLabel("Date End")
-        self.DateStart = QDateEdit(dayStart)
-        self.DateEnd = QDateEdit(QDate.currentDate())
+        labelStart = QtWidgets.QLabel("Date Start")
+        labelEnd = QtWidgets.QLabel("Date End")
+        self.DateStart = QtWidgets.QDateEdit(dayStart)
+        self.DateEnd = QtWidgets.QDateEdit(QtCore.QDate.currentDate())
         self.DateStart.setCalendarPopup(True)
         self.DateEnd.setCalendarPopup(True)
-        self.DateStart.setMaximumDate(QDate.currentDate())
-        self.DateEnd.setMaximumDate(QDate.currentDate())
-        self.HoldingStatus = QLabel('')
-        self.btnCalHold = QPushButton('Cal Holding')
+        self.DateStart.setMaximumDate(QtCore.QDate.currentDate())
+        self.DateEnd.setMaximumDate(QtCore.QDate.currentDate())
+        self.HoldingStatus = QtWidgets.QLabel('')
+        self.btnCalHold = QtWidgets.QPushButton('Cal Holding')
         self.btnCalHold.clicked.connect(self.Cal_Holding)
 
-        layoutHolding = QHBoxLayout()
+        layoutHolding = QtWidgets.QHBoxLayout()
         layoutHolding.addWidget(labelStart)
         layoutHolding.addWidget(self.DateStart)
         layoutHolding.addWidget(labelEnd)
@@ -80,12 +79,12 @@ class Ui_Jobs(object):
 
         groupHoldingLayout.addLayout(layoutHoldingTitle)
         groupHoldingLayout.addLayout(layoutHolding)
-        
+
         groupHolding.setStyleSheet('''
             QGroupBox{border: 1px solid gray;}
             QDateEdit{border: 1px solid gray;}
             QLabel{border: none;}
-            ''') 
+            ''')
 
         groupHoldingLayout.setSpacing(8)
         groupHoldingLayout.setContentsMargins(0, 0, 0, 0)
@@ -93,6 +92,3 @@ class Ui_Jobs(object):
         layoutHolding.setContentsMargins(10, 0, 10, 10)
 
         self.mainLayout.addWidget(groupHolding)
-        
-
-
