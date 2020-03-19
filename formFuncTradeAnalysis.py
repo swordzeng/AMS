@@ -146,6 +146,7 @@ class Ui_funcTradeAnalysis(object):
 
         self.SymbolCode.currentIndexChanged.connect(self.codeChanged)
         self.BuySell.currentIndexChanged.connect(self.typeChanged)
+        self.OrderID.currentIndexChanged.connect(self.orderChanged)
         self.BuySell.currentIndexChanged.connect(self.amtCal)
         self.Price.editingFinished.connect(self.amtCal)
         self.Qty.editingFinished.connect(self.amtCal)
@@ -242,12 +243,21 @@ class Ui_funcTradeAnalysis(object):
         self.Commission.setText(str(self.Symbol.Commission))
         self.Cur.setCurrentText(self.Symbol.curSettle)
 
+    def orderChanged(self):
+        self.TradeID.setCurrentText('1')
+
     def typeChanged(self):
         strBuySell = self.BuySell.currentText().split('-')[1]
         if strBuySell == 'Buy':
             self.Qty.setText(str(1))
         else:
             self.Qty.setText(str(-1))
+
+        strOpenClose = self.BuySell.currentText().split('-')[0]
+        if strOpenClose == 'Open':
+            self.TradeID.setCurrentText('1')
+        else:
+            self.TradeID.setCurrentText('2')
 
     def amtCal(self):
         price = 0 if self.Price.text().strip() == '' else float(self.Price.text().strip())
