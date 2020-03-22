@@ -256,8 +256,6 @@ class Ui_funcTradeAnalysis(object):
         strOpenClose = self.BuySell.currentText().split('-')[0]
         if strOpenClose == 'Open':
             self.TradeID.setCurrentText('1')
-        else:
-            self.TradeID.setCurrentText('2')
 
     def amtCal(self):
         price = 0 if self.Price.text().strip() == '' else float(self.Price.text().strip())
