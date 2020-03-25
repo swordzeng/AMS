@@ -228,7 +228,7 @@ def cal_holding(startDate='', endDate=''):
             # transBuy.drop(columns=['SettleAmt'],inplace=True)
             transBuy.reset_index(inplace=True)
 
-            hold = pd.merge(hold, transBuy, on=['Date', ' AccountID', 'SymbolCode', 'SymbolName', 'Cur'], how='outer')
+            hold = pd.merge(hold, transBuy, on=['Date', 'AccountID', 'SymbolCode', 'SymbolName', 'Cur'], how='outer')
             hold = pd.merge(hold, price, on=['AccountID', 'SymbolCode'], how='left')
 
             hold.fillna(0, inplace=True)
