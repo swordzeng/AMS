@@ -171,7 +171,7 @@ def initJobs(self):
     t_last = datetime.datetime.strptime(t_last_str, '%Y-%m-%d %H:%M:%S')
     t_now = datetime.datetime.now()
     t_now_str = t_now.strftime('%Y-%m-%d %H:%M:%S')
-    t_checkpoint_str = (t_now+datetime.timedelta(days=-1)).strftime('%Y-%m-%d') + ' 16:15:00'
+    t_checkpoint_str = t_now.strftime('%Y-%m-%d') + ' 16:15:00'
     t_checkpoint = datetime.datetime.strptime(t_checkpoint_str, '%Y-%m-%d %H:%M:%S')
 
     if t_last < t_checkpoint:
