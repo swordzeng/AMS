@@ -9,7 +9,7 @@ import datetime
 class Ui_ReportHolding(object):
     def initUI(self, Ui_ReportHolding):
 
-        self.acctList = ('CITIC', 'CMS', 'HUATAI', 'FUTU', 'LM')
+        self.acctList = ('CITIC', 'CMS', 'HUATAI', 'FUTU','XY')
         self.initForm()
 
     def initForm(self):

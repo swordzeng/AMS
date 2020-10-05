@@ -195,7 +195,7 @@ if __name__ == '__main__':
     ui = Ui_MainWindow()
     ui.show()
 
-    t1 = threading.Thread(target=initJobs, args=("t1",))
-    t1.start()
+    # t1 = threading.Thread(target=initJobs, args=("t1",))
+    # t1.start()
 
     sys.exit(app.exec_())
