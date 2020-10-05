@@ -9,6 +9,7 @@ from formFuncSystemMgt import Ui_funcSystemMgt
 from formFuncTradeEntry import Ui_funcTradeEntry
 from formFuncJobs import Ui_Jobs
 
+
 class Ui_MainWindow(QMainWindow):
     def __init__(self, parent=None):
 
