@@ -39,7 +39,7 @@ def get_hold(dt, account, region='ALL'):
         if region == 'CHINA':
             df_trans = df_trans[df_trans['AccountID'].isin(['CITIC', 'CMS', 'HUATAI'])]
         if region == 'HKSAR':
-            df_trans = df_trans[df_trans['AccountID'].isin(['FUTU'])]
+            df_trans = df_trans[df_trans['AccountID'].isin(['FUTU', 'SNOWBALL'])]
 
     # 取股票持仓数量
     df_stock = df_trans[~df_trans['AssetClass'].isin(['CASH'])]
